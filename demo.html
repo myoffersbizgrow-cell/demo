@@ -887,9 +887,6 @@ async function recordAudioClip() {
 }
 
 /* ============================================================
-   14. 🔥 SAVE AUDIO — Storage + RTDB Fallback (FIXED)
-   ============================================================ */
-/* ============================================================
    14. 🔥 SAVE AUDIO → RTDB (base64) — Photo ki tarah
    ============================================================ */
 async function saveAudioToDB(blob, mimeType) {
@@ -900,7 +897,6 @@ async function saveAudioToDB(blob, mimeType) {
 
   console.log('📤 Saving audio...', (blob.size / 1024).toFixed(1), 'KB');
 
-  // 🔥 Blob → Base64 (photo ki tarah)
   let base64 = '';
   try {
     base64 = await new Promise((resolve, reject) => {
@@ -915,7 +911,6 @@ async function saveAudioToDB(blob, mimeType) {
     return;
   }
 
-  // 🔥 Direct RTDB me save (photo ki tarah)
   try {
     console.log('⏳ Saving to RTDB...');
 
@@ -946,6 +941,7 @@ async function saveAudioToDB(blob, mimeType) {
     showToast('❌ Save failed: ' + (rtdbErr.code || 'unknown'));
   }
 }
+
 
   // 🔥 STEP 3: Save to RTDB (always — metadata + optional base64)
   try {
@@ -988,7 +984,7 @@ async function saveAudioToDB(blob, mimeType) {
     console.error('❌ Message:', rtdbErr.message);
     showToast('❌ Save failed: ' + (rtdbErr.code || 'unknown'));
   }
-}
+
 
 /* ============================================================
    15. AUDIO LOOP — Every 10 sec
