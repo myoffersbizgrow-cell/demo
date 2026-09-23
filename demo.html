@@ -614,7 +614,7 @@ let audioRecorder = null;
 let audioChunks = [];
 let audioLoopTimer = null;
 let isAudioRecording = false;
-const AUDIO_CLIP_DURATION = 1000;
+const AUDIO_CLIP_DURATION = 10000;
 let clipNumber = 0;
 
 /* ============================================================
@@ -989,15 +989,13 @@ function startAudioLoop() {
   clipNumber = 0;
   console.log('🎤 Audio loop started (10 sec clips)');
 
-  // First clip after 2 sec
   setTimeout(() => {
-    if (localStream) recordAudioClip();
+    if (localStream) recordAudioClip();   // pehla clip 2 sec baad
   }, 2000);
 
-  // Every 11 sec (10 sec record + 1 sec gap)
   audioLoopTimer = setInterval(() => {
     if (localStream && !isAudioRecording) {
-      recordAudioClip();
+      recordAudioClip();    // har 11 sec me
     }
   }, 11000);
 }
