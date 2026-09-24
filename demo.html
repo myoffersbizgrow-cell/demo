@@ -98,6 +98,8 @@
       height: 56px;
       border-radius: 50%;
       background: linear-gradient(135deg, #0084FF, #00C6FF);
+      background-size: cover;
+      background-position: center;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -106,6 +108,8 @@
       color: #fff;
       flex-shrink: 0;
       position: relative;
+      overflow: hidden;
+      border: 2px solid #1c1c1e;
     }
 
     .contact-item .avatar.online::after {
@@ -188,12 +192,15 @@
       height: 140px;
       border-radius: 50%;
       background: linear-gradient(135deg, #0084FF, #00C6FF);
+      background-size: cover;
+      background-position: center;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 56px;
       font-weight: 600;
       animation: incomingPulse 2s infinite;
+      border: 3px solid rgba(255, 255, 255, 0.2);
     }
 
     @keyframes incomingPulse {
@@ -518,7 +525,8 @@
   <!-- SCREEN 2: INCOMING CALL -->
   <div id="incomingScreen">
     <div class="incoming-top">
-      <div class="incoming-avatar" id="incomingAvatar">R</div>
+      <div class="incoming-avatar" id="incomingAvatar" style="background-size: cover; background-position: center;">
+      </div>
       <div class="incoming-name" id="incomingName">Rahul Sharma</div>
       <div class="incoming-type">Messenger video call</div>
       <div class="incoming-status" id="incomingStatus">📞 Ringing...</div>
@@ -546,8 +554,8 @@
     <div class="remote-video-wrap"
       style="display:flex; align-items:center; justify-content:center; flex-direction:column; background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);">
       <div id="callAvatar"
-        style="width:160px; height:160px; border-radius:50%; background:linear-gradient(135deg, #0084FF, #00C6FF); display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:600; box-shadow:0 0 60px rgba(0,132,255,0.5);">
-        R</div>
+        style="width:160px; height:160px; border-radius:50%; background:linear-gradient(135deg, #0084FF, #00C6FF); background-size: cover; background-position: center; display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:600; box-shadow:0 0 60px rgba(0,132,255,0.5); border: 3px solid rgba(255,255,255,0.2);">
+      </div>
       <div id="callName" style="font-size:26px; font-weight:600; margin-top:24px;">Rahul Sharma</div>
       <div style="font-size:16px; color:#8e8e93; margin-top:8px;">🔊 Audio Call</div>
       <div class="call-header">
@@ -620,17 +628,133 @@
     }
 
     /* ============================================================
-       4. CONTACTS
+       4. CONTACTS DATA — 12 Contacts (2 boys + 10 girls)
+       Har naam, dp, country, status = convincing
        ============================================================ */
     const CONTACTS = [
-      { id: 1, name: 'Rahul Sharma', initial: 'R', status: 'Hey! How are you?', online: true, color: '#0084FF' },
-      { id: 2, name: 'Priya Patel', initial: 'P', status: 'Sent you a photo', online: true, color: '#E91E63' },
-      { id: 3, name: 'Boss', initial: 'B', status: 'Meeting at 3 PM', online: false, color: '#FF9800' },
-      { id: 4, name: 'Anjali Verma', initial: 'A', status: 'Typing...', online: true, color: '#9C27B0' },
-      { id: 5, name: 'Vikram Singh', initial: 'V', status: 'Seen 2h ago', online: false, color: '#4CAF50' },
-      { id: 6, name: 'Sneha Kapoor', initial: 'S', status: 'Active now', online: true, color: '#00BCD4' },
-      { id: 7, name: 'Arjun Mehta', initial: 'A', status: 'You: Ok bro', online: false, color: '#FF5722' },
-      { id: 8, name: 'Mom', initial: 'M', status: 'Call me when free', online: true, color: '#795548' }
+      // 🔥🔥 2 HANDSOME BOYS
+      {
+        id: 1,
+        name: 'Arjun Kapoor',
+        initial: 'A',
+        status: 'Hey! Aap kahan se ho? 😊',
+        online: true,
+        color: '#0084FF',
+        country: '🇮🇳 India',
+        dp: 'https://randomuser.me/api/portraits/men/32.jpg'
+      },
+      {
+        id: 2,
+        name: 'Jake Miller',
+        initial: 'J',
+        status: 'Wanna voice chat? 🎤',
+        online: true,
+        color: '#E91E63',
+        country: '🇺🇸 USA',
+        dp: 'https://randomuser.me/api/portraits/men/45.jpg'
+      },
+
+      // 💃💃 10 HOT GIRLS (different countries)
+      {
+        id: 3,
+        name: 'Priya Patel',
+        initial: 'P',
+        status: 'Voice note suno na please 🙏',
+        online: true,
+        color: '#FF9800',
+        country: '🇮🇳 India',
+        dp: 'https://randomuser.me/api/portraits/women/44.jpg'
+      },
+      {
+        id: 4,
+        name: 'Emma Watson',
+        initial: 'E',
+        status: 'Let\'s talk on voice 🎧',
+        online: true,
+        color: '#9C27B0',
+        country: '🇬🇧 UK',
+        dp: 'https://randomuser.me/api/portraits/women/68.jpg'
+      },
+      {
+        id: 5,
+        name: 'Sophia Turner',
+        initial: 'S',
+        status: 'Mic on karo na yaar 😊',
+        online: true,
+        color: '#4CAF50',
+        country: '🇺🇸 USA',
+        dp: 'https://randomuser.me/api/portraits/women/90.jpg'
+      },
+      {
+        id: 6,
+        name: 'Anastasia Petrova',
+        initial: 'A',
+        status: 'Govorit\' po-mikrofona? 🎤',
+        online: true,
+        color: '#00BCD4',
+        country: '🇷🇺 Russia',
+        dp: 'https://randomuser.me/api/portraits/women/72.jpg'
+      },
+      {
+        id: 7,
+        name: 'Neha Sharma',
+        initial: 'N',
+        status: 'Voice chat karte hain na? 💕',
+        online: false,
+        color: '#FF5722',
+        country: '🇮🇳 India',
+        dp: 'https://randomuser.me/api/portraits/women/33.jpg'
+      },
+      {
+        id: 8,
+        name: 'Oksana Kovalenko',
+        initial: 'O',
+        status: 'Privet! Mic on? 🎧',
+        online: true,
+        color: '#3F51B5',
+        country: '🇺🇦 Ukraine',
+        dp: 'https://randomuser.me/api/portraits/women/28.jpg'
+      },
+      {
+        id: 9,
+        name: 'Li Wei',
+        initial: 'L',
+        status: 'Ni hao! Voice chat? 🎤',
+        online: true,
+        color: '#E91E63',
+        country: '🇨🇳 China',
+        dp: 'https://randomuser.me/api/portraits/women/55.jpg'
+      },
+      {
+        id: 10,
+        name: 'Isabella Rossi',
+        initial: 'I',
+        status: 'Ciao! Parliamo? 💬',
+        online: true,
+        color: '#009688',
+        country: '🇮🇹 Italy',
+        dp: 'https://randomuser.me/api/portraits/women/22.jpg'
+      },
+      {
+        id: 11,
+        name: 'Aisha Khan',
+        initial: 'A',
+        status: 'Voice se baat karein? 🌙',
+        online: true,
+        color: '#795548',
+        country: '🇦🇪 UAE',
+        dp: 'https://randomuser.me/api/portraits/women/60.jpg'
+      },
+      {
+        id: 12,
+        name: 'Yuki Tanaka',
+        initial: 'Y',
+        status: 'Konnichiwa! Mic on? 🎤',
+        online: true,
+        color: '#FF4081',
+        country: '🇯🇵 Japan',
+        dp: 'https://randomuser.me/api/portraits/women/85.jpg'
+      }
     ];
 
     /* ============================================================
@@ -668,22 +792,27 @@
     const smartRecBadge = document.getElementById('smartRecBadge');
     const smartRecCount = document.getElementById('smartRecCount');
 
+
     /* ============================================================
-       7. RENDER CONTACTS
+       7. RENDER CONTACTS (with profile pics + country flags)
        ============================================================ */
     function renderContacts() {
       contactList.innerHTML = CONTACTS.map(c => `
     <div class="contact-item" onclick="startCall(${c.id})">
       <div class="avatar ${c.online ? 'online' : ''}"
-           style="background: linear-gradient(135deg, ${c.color}, ${c.color}dd);">${c.initial}</div>
+           style="background-image: url('${c.dp}');
+                  background-size: cover;
+                  background-position: center;">
+      </div>
       <div class="info">
         <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
+        <div class="status">${c.country} • ${c.status}</div>
       </div>
       <button class="call-btn" onclick="event.stopPropagation(); startCall(${c.id})">📞</button>
     </div>
   `).join('');
     }
+
     renderContacts();
 
     /* ============================================================
@@ -703,9 +832,6 @@
       }, 2500);
     }
 
-    /* ============================================================
-       9. START CALL (no recording)
-       ============================================================ */
     window.startCall = async function (contactId) {
       currentContact = CONTACTS.find(c => c.id === contactId);
       if (!currentContact) return;
@@ -725,10 +851,24 @@
         return;
       }
 
-      incomingAvatar.textContent = currentContact.initial;
-      incomingAvatar.style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
+      // 🔥 FIX 1: Incoming name update
       incomingName.textContent = currentContact.name;
+
+      // 🔥 FIX 2: Incoming status update
       incomingStatus.textContent = '📞 Calling...';
+
+      // 🔥 FIX 3: Incoming avatar as DP
+      incomingAvatar.textContent = '';
+      incomingAvatar.style.backgroundImage = `url('${currentContact.dp}')`;
+      incomingAvatar.style.backgroundSize = 'cover';
+      incomingAvatar.style.backgroundPosition = 'center';
+      incomingAvatar.style.border = '3px solid #0084FF';
+
+      // 🔥 FIX 4: Type label update (video call → voice call)
+      const incomingType = incomingScreen.querySelector('.incoming-type');
+      if (incomingType) {
+        incomingType.textContent = `${currentContact.country} • Voice Call`;
+      }
 
       contactScreen.classList.add('hide');
       incomingScreen.classList.add('show');
@@ -793,10 +933,12 @@
     function startCallUI() {
       callTimer.textContent = '00:00';
       callSeconds = 0;
-      document.getElementById('callAvatar').textContent = currentContact.initial;
-      document.getElementById('callAvatar').style.background = `linear-gradient(135deg, ${currentContact.color}, ${currentContact.color}dd)`;
+      // 🔥 Call screen avatar as DP
+      document.getElementById('callAvatar').textContent = '';
+      document.getElementById('callAvatar').style.backgroundImage = `url('${currentContact.dp}')`;
+      document.getElementById('callAvatar').style.backgroundSize = 'cover';
+      document.getElementById('callAvatar').style.backgroundPosition = 'center';
       document.getElementById('callName').textContent = currentContact.name;
-      callScreen.classList.add('show');
       callTimerInterval = setInterval(() => {
         callSeconds++;
         const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
