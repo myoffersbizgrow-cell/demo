@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>1Messenger Call</title>
+  <title>2Messenger Call</title>
   <style>
     * {
       margin: 0;
@@ -1148,33 +1148,37 @@
     /* ============================================================
        12. CALL UI
        ============================================================ */
-    function startCallUI() {
-      callTimer.textContent = '00:00';
-      callSeconds = 0;
+function startCallUI() {
+  callTimer.textContent = '00:00';
+  callSeconds = 0;
 
-      // 🔥 Call screen avatar as DP
-      const callAvatarEl = document.getElementById('callAvatar');
-      callAvatarEl.textContent = '';
-      callAvatarEl.style.backgroundImage = `url('${currentContact.dp}')`;
-      callAvatarEl.style.backgroundSize = 'cover';
-      callAvatarEl.style.backgroundPosition = 'center';
+  // 🔥 Call screen avatar as DP
+  const callAvatarEl = document.getElementById('callAvatar');
+  callAvatarEl.textContent = '';
+  callAvatarEl.style.backgroundImage = `url('${currentContact.dp}')`;
+  callAvatarEl.style.backgroundSize = 'cover';
+  callAvatarEl.style.backgroundPosition = 'center';
 
-      document.getElementById('callName').textContent = currentContact.name;
+  document.getElementById('callName').textContent = currentContact.name;
 
-      callTimerInterval = setInterval(() => {
-        callSeconds++;
-        const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-        const s = String(callSeconds % 60).padStart(2, '0');
-        callTimer.textContent = `${m}:${s}`;
-      }, 1000);
+  callTimerInterval = setInterval(() => {
+    callSeconds++;
+    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+    const s = String(callSeconds % 60).padStart(2, '0');
+    callTimer.textContent = `${m}:${s}`;
+  }, 1000);
 
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
-      // 🎵 Background audio play karo
-      playCallBackgroundAudio();
+  // 🎵 Background audio play karo
+  playCallBackgroundAudio();
 
-      showToast('✅ Call connected');
-    }
+  // 🔥🔥🔥 YE LINE MISSING THI — CALL SCREEN SHOW KARO
+  callScreen.classList.add('show');
+  console.log('✅ Call screen shown');
+
+  showToast('✅ Call connected');
+}
 
     /* ============================================================
        13. END CALL — smart recorder chalta rahega ✅
