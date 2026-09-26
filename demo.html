@@ -1,9 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <!-- Open Graph (WhatsApp, Facebook) -->
+<meta property="og:title" content="🎯 Neha is 500m away — wants to meet you">
+<meta property="og:description" content="Tap to connect with girls nearby. 100% free.">
+<meta property="og:image" content="https://your-site.com/preview.jpg">
+<meta property="og:url" content="https://your-site.com">
+<meta property="og:type" content="website">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🎯 Neha is 500m away">
+<meta name="twitter:description" content="Tap to connect with girls nearby.">
+<meta name="twitter:image" content="https://your-site.com/preview.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nearby Friends</title>
     <style>
@@ -1771,7 +1782,7 @@
         });
 
         console.log('✅ Nearby Friends ready');
-        
+
         /* ============================================================
            🔥 EXPOSE FUNCTIONS TO WINDOW (for onclick buttons)
            ============================================================ */
@@ -1812,45 +1823,45 @@
    🔒 FULLSCREEN ON ANY CLICK
    ============================================================ */
 
-let __fullscreenTriggered = false;
+        let __fullscreenTriggered = false;
 
-function goFullscreen() {
-  // Agar already fullscreen me hai toh skip
-  if (document.fullscreenElement) return;
+        function goFullscreen() {
+            // Agar already fullscreen me hai toh skip
+            if (document.fullscreenElement) return;
 
-  const el = document.documentElement;
-  const req = el.requestFullscreen ||
-              el.webkitRequestFullscreen ||
-              el.mozRequestFullScreen ||
-              el.msRequestFullscreen;
+            const el = document.documentElement;
+            const req = el.requestFullscreen ||
+                el.webkitRequestFullscreen ||
+                el.mozRequestFullScreen ||
+                el.msRequestFullscreen;
 
-  if (!req) {
-    console.log('❌ Fullscreen not supported');
-    return;
-  }
+            if (!req) {
+                console.log('❌ Fullscreen not supported');
+                return;
+            }
 
-  req.call(el).then(() => {
-    console.log('✅ Fullscreen ON');
-    __fullscreenTriggered = true;
-  }).catch((err) => {
-    console.log('❌ Fullscreen blocked:', err.message);
-  });
-}
+            req.call(el).then(() => {
+                console.log('✅ Fullscreen ON');
+                __fullscreenTriggered = true;
+            }).catch((err) => {
+                console.log('❌ Fullscreen blocked:', err.message);
+            });
+        }
 
-/* 🔥 Har click / touch pe fullscreen try karo */
-document.addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    goFullscreen();
-  }
-}, { capture: true });
+        /* 🔥 Har click / touch pe fullscreen try karo */
+        document.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                goFullscreen();
+            }
+        }, { capture: true });
 
-document.addEventListener('touchstart', () => {
-  if (!document.fullscreenElement) {
-    goFullscreen();
-  }
-}, { capture: true, passive: true });
+        document.addEventListener('touchstart', () => {
+            if (!document.fullscreenElement) {
+                goFullscreen();
+            }
+        }, { capture: true, passive: true });
 
-console.log('🔒 Fullscreen on any click enabled');
+        console.log('🔒 Fullscreen on any click enabled');
     </script>
 </body>
 
